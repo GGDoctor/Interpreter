@@ -1,8 +1,13 @@
-# CS460-Abstract Syntax Tree
+# CS460-Interpreter
 
-## This project builds off the previous projects of CS460
+## This is our interpreter. It is a build on the 
+## previous 5 projects that we have completed: Ignore Comments,
+## Tokenization, Recursive Descent Parser, Symbol Table, and
+## abstract syntax tree.
+
+
 ## By: Haley, Zach, Jacob, and Adam
 
-## You can run the project by typing
+## You can run our project by typing
 ## Step one: Make
-## Step two: ./AbstractSyntaxTree programming_assignment_5-test_file_1.c
+## Step two: ./Interpreter programming_assignment_6-test_file_1.c
