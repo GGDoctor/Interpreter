@@ -1,6 +1,7 @@
 #include "interpreter.hpp"
 using namespace std;
 
+/*
 Interpreter::Interpreter(AbstractSyntaxTree* ast, SymbolTable* symbolTable)
     : ast(ast), symbolTable(symbolTable), programCounter(0) {}
 
@@ -76,3 +77,5 @@ int main() {
 
     return 0;
 }
+
+*/

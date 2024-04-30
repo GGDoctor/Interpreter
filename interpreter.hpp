@@ -8,11 +8,13 @@
 
 class Interpreter {
 public:
+/*
     Interpreter(AbstractSyntaxTree* ast, SymbolTable* symbolTable);
 
     void execute(); // Execute the AST starting from the main procedure
-
+*/
 private:
+    /*
     AbstractSyntaxTree* ast;   // Pointer to the AST for the program
     SymbolTable* symbolTable;  // Pointer to the symbol table
     int programCounter;        // Program counter to manage control flow
@@ -22,6 +24,7 @@ private:
     int evaluatePostfixExpression(const std::vector<Token>& tokens); // Evaluate postfix expressions
     void handleFunctionCall(ASTNode* node); // Handle function calls
     void updateProgramCounter(ASTNode* node); // Update program counter based on control structures
+    */
 };
 
 #endif // INTERPRETER_HPP

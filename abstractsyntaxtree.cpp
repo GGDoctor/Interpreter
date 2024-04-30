@@ -201,8 +201,7 @@ AbstractSyntaxTree::AbstractSyntaxTree(RecursiveDescentParser concreteSyntaxTree
 
 
 
-    LCRS *ast = nullptr; // new LCRS(result[0]);
-    LCRS *temp = ast;
+    
 
     vector<vector<Token>> abstract;
 
@@ -226,7 +225,7 @@ AbstractSyntaxTree::AbstractSyntaxTree(RecursiveDescentParser concreteSyntaxTree
                 k.push_back(callToken);
                 //cout << "test2" << endl;
                 for (int index = 0; index < postfix.size(); index++){
-                     k.push_back(postfix[index]);
+                     k.push_back(postfix[index]);     
                 }
                 //cout << "test3" << endl;
                 int foundFunctionProcedureCall = findFunctionProcedureCall(k, symbolTable.table);
@@ -537,7 +536,28 @@ AbstractSyntaxTree::AbstractSyntaxTree(RecursiveDescentParser concreteSyntaxTree
         }
         abstract.push_back(k);
     }
+
+    LCRS *ast = abstract.size() > 0 ? new LCRS(abstract[0][0]) : nullptr; // new LCRS(result[0]);
+    LCRS *temp = ast;
     
+    for (int i = 0; i < abstract.size(); i++) {
+        for (int j = 1; j < abstract[i].size(); j++) {
+            temp->rightSibling = new LCRS(abstract[i][j]);
+            temp = temp->rightSibling;
+        }
+
+        if (i + 1 < abstract.size()) {
+            temp->leftChild = new LCRS(abstract[i + 1][0]);
+            temp = temp->leftChild;
+        }
+        
+    }
+
+    abstractSyntaxTree = ast;
+
+
+    
+/*
     for (auto i : abstract)
     {
         for (auto j : i)
@@ -546,6 +566,10 @@ AbstractSyntaxTree::AbstractSyntaxTree(RecursiveDescentParser concreteSyntaxTree
         }
         cout << '\n';
     }
+
+    cout << "\n\n\n\n";
+*/
+
 }
 
 /**
