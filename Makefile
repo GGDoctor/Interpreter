@@ -2,13 +2,13 @@
 CC = g++ -std=c++17
 
 # Source files
-SRCS = IgnoreComments.cpp Tokenization.cpp RecursiveDescentParser.cpp symboltable.cpp abstractsyntaxtree.cpp infixtopostfix.cpp interpreter.cpp main.cpp
+SRCS = IgnoreComments.cpp Tokenization.cpp RecursiveDescentParser.cpp symboltable.cpp abstractsyntaxtree.cpp infixtopostfix.cpp main.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
 
 # Executable file
-MAIN = Interpreter
+MAIN = AbstractSyntaxTree
 
 # Build rule for the executable
 $(MAIN): $(OBJS)
