@@ -9,59 +9,49 @@ ast(ast), symbolTable(symbolTable), concreteSyntaxTree(concreteSyntaxTree), prog
 }
 
 void Interpreter::execute() {
-        // Start execution from the main procedure
-        list<TableEntry> newTable = symbolTable.table;
-        for( auto i: newTable){
-            if(i.identifierName == "main"){
-                cout << "HERE " << i.scope << endl;
-                int mainLine = FindMain(ast.abstractSyntaxTree, concreteSyntaxTree.getConcreteSyntaxTree());
-                cout << mainLine << endl;
-                break;
+    // Start execution from the main procedure
+    list<TableEntry> newTable = symbolTable.table;
+    for (auto i : newTable) {
+        if (i.identifierName == "main") {
+            cout << "Main procedure found in the symbol table." << endl;
+
+            // Call FindMain to get the line number of the main procedure
+            int mainLine = FindMain(ast.abstractSyntaxTree, concreteSyntaxTree.getConcreteSyntaxTree());
+            if (mainLine != -1) {
+                cout << "Main procedure found at line " << mainLine << "." << endl;
+            } else {
+                cout << "Main procedure not found in the concrete syntax tree." << endl;
             }
-        }
-        //executeNode(ast.abstractSyntaxTree);
-}
 
-int Interpreter::FindMain(LCRS* mainAST, LCRS* mainCST){
-    LCRS* tempCST = mainCST;
-    LCRS* tempAST = mainAST;
-    // while(tempCST->leftChild != nullptr){
-    //     while(tempCST->rightSibling != nullptr){
-    //         if(tempCST->token.character == "main"){
-    //             cout << "I found main on line " << tempCST->token.lineNumber << endl;
-    //             return tempCST->token.lineNumber;
-    //         }
-    //         tempCST = tempCST->rightSibling;
-    //     }
-    
-    // }
-    //cout << tempCST->token.character << endl;
-    while(tempCST != nullptr){
-        cout << tempCST->leftChild->token.character << endl;
-        if(tempCST->token.character == "procedure" && tempCST->rightSibling->token.character == "main"){
-            return tempCST->token.lineNumber;
+            break;
         }
-        while(tempCST){
-            tempCST = tempCST->rightSibling;
-        }
-        tempCST = tempCST->leftChild;
     }
-    
-    // if(tempCST == nullptr){
-    //     return 0;
-    // }
-    // cout << tempCST->token.character << " ";
-
-    // if(tempCST->token.character == "main"){
-    //     cout << "I found main on line " << tempCST->token.lineNumber << endl;
-    //     return tempCST->token.lineNumber;
-    // }
-
-    // FindMain(tempAST, tempCST->rightSibling);
-    // cout << endl;
-    // FindMain(tempAST->leftChild, tempCST->leftChild);
-    return -1;
 }
+
+
+int Interpreter::FindMain(LCRS* mainAST, LCRS* mainCST) {
+    if (!mainCST) return -1;  // Check if the CST is null
+
+    // Traverse the CST
+    while (mainCST) {
+        // Check if the current node contains the main procedure
+        if (mainCST->token.character == "main") {
+            return mainCST->token.lineNumber;  // Return the line number of the main procedure
+        }
+
+        // Recursively traverse child nodes
+        int result = FindMain(mainAST, mainCST->leftChild);
+        if (result != -1) {
+            return result;  // Return the result if main is found in the child
+        }
+
+        // Move to the next sibling
+        mainCST = mainCST->rightSibling;
+    }
+
+    return -1;  // Return -1 if main is not found
+}
+
 /*
 void Interpreter::executeNode(ASTNode* node) {
     if (!node) return;
