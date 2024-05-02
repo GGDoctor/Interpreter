@@ -49,6 +49,8 @@ public:
      */
     friend ostream &operator<<(ostream &os, const AbstractSyntaxTree &obj);
 
+    friend class Interpreter;
+
 private:
     LCRS *abstractSyntaxTree;
 
@@ -85,6 +87,7 @@ private:
     {
         return !(token.character == "^" || token.character == "&&");
     }
+
 
     vector<Token> infixToPostfix(const vector<Token> &infix)
     {

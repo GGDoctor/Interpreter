@@ -9,6 +9,7 @@
 #include "RecursiveDescentParser.hpp"
 #include "symboltable.hpp"
 #include "abstractsyntaxtree.hpp"
+#include "interpreter.hpp"
 #include "infixtopostfix.cpp"
 #include <iostream>
 #include <sstream>
@@ -53,7 +54,9 @@ int main(int argc, char *argv[]) {
     // cout << symbolTable;
 
     AbstractSyntaxTree abstractSyntaxTree(recursiveDescentParser, symbolTable);
-    cout << abstractSyntaxTree;
+    //cout << abstractSyntaxTree;
+
+    Interpreter interpreter(abstractSyntaxTree, symbolTable);
     
 
     return 0;

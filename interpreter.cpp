@@ -1,17 +1,23 @@
 #include "interpreter.hpp"
 using namespace std;
 
-/*
-Interpreter::Interpreter(AbstractSyntaxTree* ast, SymbolTable* symbolTable)
-    : ast(ast), symbolTable(symbolTable), programCounter(0) {}
 
-void Interpreter::execute() {
-    if (ast && ast->getRoot()) {
-        // Start execution from the main procedure
-        executeNode(ast->getRoot());
-    }
+Interpreter::Interpreter(AbstractSyntaxTree ast, SymbolTable symbolTable): ast(ast), symbolTable(symbolTable), programCounter(0) {
+
+    execute();
 }
 
+void Interpreter::execute() {
+        // Start execution from the main procedure
+        list<TableEntry> newTable = symbolTable.table;
+        for( auto i: newTable){
+            if(i.identifierName == "main"){
+                cout << "HERE" << endl;
+            }
+        }
+        //executeNode(ast.abstractSyntaxTree);
+}
+/*
 void Interpreter::executeNode(ASTNode* node) {
     if (!node) return;
 
@@ -66,16 +72,17 @@ void Interpreter::handleFunctionCall(ASTNode* node) {
 void Interpreter::updateProgramCounter(ASTNode* node) {
     // Placeholder for program counter logic, e.g., handling loops, if-else conditions
 }
-
-int main() {
-    // Setup and execute the interpreter
-    AbstractSyntaxTree* ast; // Assume AST is created elsewhere
-    SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
-
-    Interpreter interpreter(ast, symbolTable);
-    interpreter.execute();
-
-    return 0;
-}
-
 */
+
+// int main() {
+//     // Setup and execute the interpreter
+//     // AbstractSyntaxTree* ast; // Assume AST is created elsewhere
+//     // SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
+
+//     Interpreter interpreter(ast, symbolTable);
+//     interpreter.execute();
+
+//     return 0;
+// }
+
+
