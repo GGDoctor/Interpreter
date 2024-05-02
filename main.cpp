@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     AbstractSyntaxTree abstractSyntaxTree(recursiveDescentParser, symbolTable);
     //cout << abstractSyntaxTree;
 
-    Interpreter interpreter(abstractSyntaxTree, symbolTable);
+    Interpreter interpreter(abstractSyntaxTree, symbolTable, recursiveDescentParser);
     
 
     return 0;
