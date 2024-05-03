@@ -19,6 +19,16 @@ Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, Sym
 void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCRS *_cst) {
     LCRS* abstract = _ast;
     LCRS* concrete = _cst;
+
+    while (abstract && concrete) {
+        cstByAst[abstract] = concrete;
+        
+        while (abstract->rightSibling) abstract = abstract->rightSibling;
+        while (concrete->rightSibling) concrete = concrete->rightSibling;
+        abstract = abstract->leftChild;
+        concrete = concrete->leftChild;
+    }
+
     // used for multiple variables declared on same line seperated by commas
     int commaCounter = 0;
     
@@ -101,15 +111,6 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
         }
     }   
 
-    while (abstract && concrete) {
-        cstByAst[abstract] = concrete;
-        
-        while (abstract->rightSibling) abstract = abstract->rightSibling;
-        while (concrete->rightSibling) concrete = concrete->rightSibling;
-        abstract = abstract->leftChild;
-        concrete = concrete->leftChild;
-    }
-
 }
 
 void Interpreter::printCstBySymbolTable() {
@@ -126,7 +127,7 @@ void Interpreter::printCstBySymbolTable() {
         cout << "SCOPE: " << entry.scope << '\n';
         cout << '\n';
 
-        cout << "\tcst line " << cstNode->token.lineNumber << ": ";
+        cout << "\tast line " << cstNode->token.lineNumber << ": ";
 
         while (cstNode) {
             cout << cstNode->token.character;
@@ -137,8 +138,34 @@ void Interpreter::printCstBySymbolTable() {
         }
 
         cout << "\n\n";
+    }
+}
 
-        
+void Interpreter::printAstBySymbolTable() {
+    for (auto [entry, astNode] : astBySymbolTable) {
+        cout << "IDENTIFIER_NAME: " << entry.identifierName << '\n';
+        cout << "IDENTIFIER_TYPE: " << entry.identifierType << '\n';
+        cout << "DATATYPE: " << entry.datatype << '\n';
+        cout << "DATATYPE_IS_ARRAY: ";
+        if (entry.datatypeIsArray)
+            cout << "yes\n";
+        else
+            cout << "no\n";
+        cout << "DATATYPE_ARRAY_SIZE: " << entry.datatypeArraySize << '\n';
+        cout << "SCOPE: " << entry.scope << '\n';
+        cout << '\n';
+
+        cout << "\tast line " << astNode->token.lineNumber << ": ";
+
+        while (astNode) {
+            cout << astNode->token.character;
+            if (astNode->rightSibling) {
+                cout << " -> ";
+            }
+            astNode = astNode->rightSibling;
+        }
+
+        cout << "\n\n";
     }
 }
 

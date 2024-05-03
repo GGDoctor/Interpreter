@@ -12,7 +12,9 @@ class Interpreter {
 public:
     Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable);
 
+    void printAstBySymbolTable();
     void printCstBySymbolTable();
+    
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
     void execute(); // Execute the AST starting from the main procedure
