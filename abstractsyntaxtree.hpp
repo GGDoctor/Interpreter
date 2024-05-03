@@ -49,7 +49,10 @@ public:
      */
     friend ostream &operator<<(ostream &os, const AbstractSyntaxTree &obj);
 
-    friend class Interpreter;
+    /**
+     * @brief getter for abstractSyntaxTree node
+     */
+     LCRS* getAbstractSyntaxTree() { return abstractSyntaxTree; }
 
 private:
     LCRS *abstractSyntaxTree;

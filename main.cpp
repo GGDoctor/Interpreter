@@ -43,7 +43,9 @@ int main(int argc, char *argv[]) {
     //symbolTable.print();
         
     RecursiveDescentParser recursiveDescentParser(tokens);
-    // cout << recursiveDescentParser;
+    //cout << recursiveDescentParser;
+
+    //cout << "\n\n\n\n\n";
 
     // converting the output stream to a string for SymbolTable constructor
     /*
@@ -51,13 +53,17 @@ int main(int argc, char *argv[]) {
     ss2 << recursiveDescentParser;
     */
     SymbolTable symbolTable(recursiveDescentParser);
-    // cout << symbolTable;
+    cout << symbolTable;
+
+    cout << "\n\n\n\n\n";
 
     AbstractSyntaxTree abstractSyntaxTree(recursiveDescentParser, symbolTable);
     //cout << abstractSyntaxTree;
-
-    Interpreter interpreter(abstractSyntaxTree, symbolTable, recursiveDescentParser);
     
+    Interpreter interpreter(abstractSyntaxTree, recursiveDescentParser, symbolTable);
+    //interpreter.printAstCstBySymbolTable();
+    interpreter.printAstBySymbolTable();
+    interpreter.printCstBySymbolTable();
 
     return 0;
 }
