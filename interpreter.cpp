@@ -257,3 +257,16 @@ int main() {
     return 0;
 }
 */
+
+// int main() {
+//     // Setup and execute the interpreter
+//     // AbstractSyntaxTree* ast; // Assume AST is created elsewhere
+//     // SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
+
+//     Interpreter interpreter(ast, symbolTable);
+//     interpreter.execute();
+
+//     return 0;
+// }
+
+

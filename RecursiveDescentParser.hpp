@@ -47,6 +47,7 @@ public:
      */
     string BFS() const;
 
+    friend class Interpreter;
 private:
     /**
      * @brief The data for a LCRS node 

@@ -91,6 +91,7 @@ private:
         return !(token.character == "^" || token.character == "&&");
     }
 
+
     vector<Token> infixToPostfix(const vector<Token> &infix)
     {
         vector<Token> postfix;

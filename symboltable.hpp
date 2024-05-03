@@ -76,6 +76,8 @@ public:
      *      ex: cout << SymbolTableObj;
      */
     friend ostream& operator << (ostream& os, const SymbolTable& obj);
+
+    friend class Interpreter;
 private:
     void parseParams(const vector<string>& params, int scope, const string& 
                                                                 paramListName);
