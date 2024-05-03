@@ -75,6 +75,7 @@ private:
     friend class RecursiveDescentParser;
     friend class AbstractSyntaxTree;
     friend class SymbolTable;
+    friend class Interpreter;
 };
 
 

@@ -3,6 +3,15 @@
 #include <sstream>
 #include <cassert>
 
+bool operator==(const TableEntry& lhs, const TableEntry& rhs) {
+    return lhs.identifierName == rhs.identifierName &&
+        lhs.identifierType == rhs.identifierType &&
+        lhs.datatype == rhs.datatype &&
+        lhs.datatypeIsArray == rhs.datatypeIsArray &&
+        lhs.datatypeArraySize == rhs.datatypeArraySize &&
+        lhs.scope == rhs.scope;
+}
+
 /**
  * @brief Constructs SymbolTable object
  * @param concreteSyntaxTree - The concrete syntax tree that was generated in

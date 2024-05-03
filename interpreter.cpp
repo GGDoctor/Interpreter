@@ -1,18 +1,170 @@
 #include "interpreter.hpp"
 using namespace std;
 
-/*
-Interpreter::Interpreter(AbstractSyntaxTree* ast, SymbolTable* symbolTable)
-    : ast(ast), symbolTable(symbolTable), programCounter(0) {}
 
-void Interpreter::execute() {
-    if (ast && ast->getRoot()) {
-        // Start execution from the main procedure
-        executeNode(ast->getRoot());
+Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable) {
+    this->ast = ast.getAbstractSyntaxTree();
+    this->cst = cst.getConcreteSyntaxTree();
+    LCRS* abstract = this->ast;
+    LCRS* concrete = this->cst;
+
+    populateMappings(symbolTable.table, abstract, concrete);
+
+}
+
+/**
+ * @param symbolTableEntry - entry in the symbol table
+ * @brief takes a symbol table entry as input and adds it to ast and cst maps
+ */
+void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCRS *_cst) {
+    LCRS* abstract = _ast;
+    LCRS* concrete = _cst;
+    // used for multiple variables declared on same line seperated by commas
+    int commaCounter = 0;
+    
+    for (const auto &entry : symbolTable) {
+        if (entry.identifierType == "function") {
+
+            while (_cst->token.character != "function") {
+                while (_cst->rightSibling) _cst = _cst->rightSibling;
+                while (_ast->rightSibling) _ast = _ast->rightSibling;
+                _cst = _cst->leftChild;
+                _ast = _ast->leftChild;
+            }
+            cstBySymbolTable[entry] = _cst;
+            astBySymbolTable[entry] = _ast;
+
+        } else if (entry.identifierType == "procedure") {
+
+            while (_cst->token.character != "procedure") {
+                while (_cst->rightSibling) _cst = _cst->rightSibling;
+                while (_ast->rightSibling) _ast = _ast->rightSibling;
+                _cst = _cst->leftChild;
+                _ast = _ast->leftChild;
+            }
+            cstBySymbolTable[entry] = _cst;
+            astBySymbolTable[entry] = _ast;
+
+        } else if (entry.identifierType == "datatype") {
+
+            if (entry.datatype == "int") {
+
+                if (commaCounter > 0) commaCounter--;
+                else {
+                    while (_cst->rightSibling) _cst = _cst->rightSibling;
+                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                    if (_cst->leftChild) _cst = _cst->leftChild;
+                    if (_ast->leftChild) _ast = _ast->leftChild;
+                }
+
+                while (_cst->token.character != "int") {
+                    while (_cst->rightSibling) _cst = _cst->rightSibling;
+                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                    _cst = _cst->leftChild;
+                    _ast = _ast->leftChild;
+
+                }
+                cstBySymbolTable[entry] = _cst;
+                astBySymbolTable[entry] = _ast;
+
+                LCRS* tempCst = _cst;
+                LCRS* tempAst = _ast;
+
+                while (tempCst->rightSibling) {
+                    if (tempCst->token.character == ",") commaCounter++;
+                    tempCst = tempCst->rightSibling;
+                }
+
+            } else if (entry.datatype == "char") {
+
+                while (_cst->token.character != "char") {
+                    while (_cst->rightSibling) _cst = _cst->rightSibling;
+                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                    _cst = _cst->leftChild;
+                    _ast = _ast->leftChild;
+                }
+                cstBySymbolTable[entry] = _cst;
+                astBySymbolTable[entry] = _ast;
+
+            } else if (entry.datatype == "bool") {
+
+                while (_cst->token.character != "bool") {
+                    while (_cst->rightSibling) _cst = _cst->rightSibling;
+                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                    _cst = _cst->leftChild;
+                    _ast = _ast->leftChild;
+                }
+                cstBySymbolTable[entry] = _cst;
+                astBySymbolTable[entry] = _ast;
+
+            }
+        }
+    }   
+
+    while (abstract && concrete) {
+        cstByAst[abstract] = concrete;
+        
+        while (abstract->rightSibling) abstract = abstract->rightSibling;
+        while (concrete->rightSibling) concrete = concrete->rightSibling;
+        abstract = abstract->leftChild;
+        concrete = concrete->leftChild;
+    }
+
+}
+
+void Interpreter::printCstBySymbolTable() {
+    for (auto [entry, cstNode] : cstBySymbolTable) {
+        cout << "IDENTIFIER_NAME: " << entry.identifierName << '\n';
+        cout << "IDENTIFIER_TYPE: " << entry.identifierType << '\n';
+        cout << "DATATYPE: " << entry.datatype << '\n';
+        cout << "DATATYPE_IS_ARRAY: ";
+        if (entry.datatypeIsArray)
+            cout << "yes\n";
+        else
+            cout << "no\n";
+        cout << "DATATYPE_ARRAY_SIZE: " << entry.datatypeArraySize << '\n';
+        cout << "SCOPE: " << entry.scope << '\n';
+        cout << '\n';
+
+        cout << "\tcst line " << cstNode->token.lineNumber << ": ";
+
+        while (cstNode) {
+            cout << cstNode->token.character;
+            if (cstNode->rightSibling) {
+                cout << " -> ";
+            }
+            cstNode = cstNode->rightSibling;
+        }
+
+        cout << "\n\n";
+
+        
     }
 }
 
-void Interpreter::executeNode(ASTNode* node) {
+
+
+/*
+Interpreter::Interpreter(LCRS* ast, SymbolTable symbolTable)
+    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
+
+void Interpreter::execute() {
+
+}
+
+*/
+/*
+Interpreter::Interpreter(LCRS* ast, SymbolTable* symbolTable)
+    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
+
+void Interpreter::execute() {
+    if (abstractSyntaxTree) {
+        // Start execution from the main procedure
+        executeNode(abstractSyntaxTree);
+    }
+}
+
+void Interpreter::executeNode(LCRS* node) {
     if (!node) return;
 
     updateProgramCounter(node);  // Update the program counter before execution
@@ -34,7 +186,7 @@ void Interpreter::executeNode(ASTNode* node) {
     }
 
     // Recursively execute child nodes if not a control flow statement
-    for (auto child : node->children) {
+    for (auto child : node->leftChild) {
         executeNode(child);
     }
 }
@@ -77,5 +229,4 @@ int main() {
 
     return 0;
 }
-
 */

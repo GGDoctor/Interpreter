@@ -20,6 +20,23 @@ struct TableEntry {
     int scope;
 };
 
+bool operator==(const TableEntry& lhs, const TableEntry& rhs);
+
+// Define a hash function for TableEntry
+struct TableEntryHash {
+    std::size_t operator()(const TableEntry& entry) const {
+        // Combine hash values of individual members
+        std::size_t hashValue = 0;
+        hashValue ^= std::hash<std::string>{}(entry.identifierName);
+        hashValue ^= std::hash<std::string>{}(entry.identifierType);
+        hashValue ^= std::hash<std::string>{}(entry.datatype);
+        hashValue ^= std::hash<bool>{}(entry.datatypeIsArray);
+        hashValue ^= std::hash<int>{}(entry.datatypeArraySize);
+        hashValue ^= std::hash<int>{}(entry.scope);
+        return hashValue;
+    }
+};
+
 struct ParamListEntry {
     ParamListEntry() : identifierName(""), datatype(""), 
                        datatypeIsArray(false), datatypeArraySize(0), 
@@ -66,6 +83,7 @@ private:
     list<ParamListEntry> paramTable;
     
     friend class AbstractSyntaxTree;
+    friend class Interpreter;
 };
 
 #endif /* SYMBOLTABLE_HPP */
