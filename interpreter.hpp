@@ -49,6 +49,8 @@ private:
      */
     void populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCRS *_cst);
 
+    void iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>, unordered_map<TableEntry, LCRS*, TableEntryHash>, unordered_map<LCRS*, LCRS*>);
+
     
 
     //Token executeNumericalExpression(Stack numberStack);
