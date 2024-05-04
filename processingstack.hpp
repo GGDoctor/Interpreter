@@ -13,14 +13,14 @@ using namespace std;
 
 //Linked list node
 
-struct Node {
+struct Processing_Node {
     //Can add a data variable here need to figure out the type
     int data; 
     //Pointer to the next node in our stack
     Node* next;
 
     //Constructor for the node 
-    Node(int val) : data(val), next(nullptr) {}
+    Processing_Node(int val) : data(val), next(nullptr) {}
 };
 
 /*
@@ -55,7 +55,7 @@ class ProcessingStack{
     private:
         
         //Pointer to the head of the stack
-        Node* head;
+        Processing_Node* head;
 };
 
 #endif /* PROCESSINGSTACK_HPP */
