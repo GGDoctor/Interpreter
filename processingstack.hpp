@@ -1,5 +1,3 @@
-// processingstack.hpp
-
 #ifndef PROCESSINGSTACK_HPP
 #define PROCESSINGSTACK_HPP
 
@@ -9,6 +7,7 @@
 #include <cassert>
 #include <sstream>
 #include <stack>
+#include "interpreter.hpp"
 
 using namespace std;
 
