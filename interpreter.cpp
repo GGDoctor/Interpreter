@@ -10,6 +10,8 @@ Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, Sym
 
     populateMappings(symbolTable.table, abstract, concrete);
 
+    iterateMaps(astBySymbolTable, cstBySymbolTable, cstByAst);
+
 }
 
 /**
@@ -181,6 +183,17 @@ void Interpreter::printAstBySymbolTable() {
 }
 
 
+void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
+    for(auto[entry, astNode]:astSym){
+        if(entry.identifierName == "main"){
+            //cout << "TEST " << cstAst.at(astNode)->token.lineNumber << endl;
+            cout << "TEST " << cstSym.at(entry)->token.character << endl;
+        }
+    }
+}
+
+
+
 
 void Interpreter::executeStack(/*Stack testStack*/){
     Stack enteredStack;
@@ -244,7 +257,6 @@ void Interpreter::executeStack(/*Stack testStack*/){
         
     }
     
-
 
 }
 
