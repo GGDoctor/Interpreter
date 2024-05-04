@@ -4,7 +4,8 @@
 #include "abstractsyntaxtree.hpp"
 #include "symboltable.hpp"
 #include "RecursiveDescentParser.hpp"
-#include <stack>
+#include "stack.hpp"
+//#include <stack>
 #include <vector>
 #include <unordered_map> 
 
@@ -14,6 +15,7 @@ public:
 
     void printAstBySymbolTable();
     void printCstBySymbolTable();
+    void executeStack(/*Stack testStack*/);
     
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
@@ -47,6 +49,12 @@ private:
      */
     void populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCRS *_cst);
 
+    void iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>, unordered_map<TableEntry, LCRS*, TableEntryHash>, unordered_map<LCRS*, LCRS*>);
+
+    
+
+    //Token executeNumericalExpression(Stack numberStack);
+
 
 /*
     LCRS* abstractSyntaxTree;
@@ -61,8 +69,9 @@ private:
     void handleFunctionCall(LCRS* node); // Handle function calls
     void updateProgramCounter(LCRS* node); // Update program counter based on control structures
     
-    
-};
 */
 };
-#endif // INTERPRETER_HPP 
+
+
+#endif INTERPRETER_HPP
+
