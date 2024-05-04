@@ -12,7 +12,7 @@ void ProcessingStack::Pop()
     }
 
     Processing_Node* temp = head;
-    head = head->next;
+    //head = head->next;
     delete temp;    
 }
 
@@ -20,7 +20,7 @@ void ProcessingStack::Push(int new_data)
 {
     // Add the new node to the top of the stack
     Processing_Node *new_node = new Processing_Node(new_data);
-    new_node->next = head;
+    //new_node->next = head;
     head = new_node;
 }
 
