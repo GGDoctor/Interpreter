@@ -61,7 +61,7 @@ private:
     void handleFunctionCall(LCRS* node); // Handle function calls
     void updateProgramCounter(LCRS* node); // Update program counter based on control structures
     
-    
+*/
 };
 
 #endif // INTERPRETER_HPP
