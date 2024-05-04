@@ -25,6 +25,23 @@ void ProcessingStack::Push(int new_data)
 }
 
 
+
+
+//Example:  Working stack
+//		n n + 2 *
+//		(n + n) * 2
+//		to evaluate: "n n + 2 *"
+//		1. push n
+//		2. push n
+//		3. push +
+//		4. Stack points to the operator and two operands underneath.
+//		4a. POP +
+//		4b. POP n
+//		4c. POP n
+//		(stack empty)
+//		5. evaluate n + n
+//		6. push "n + n" (the result) on the stack. It should be a number.
+
 //please help actually getting our tokens linked.
 int ProcessingStack::evaluateExpression(const string& expression) {
     istringstream iss(expression);
