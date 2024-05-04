@@ -2,60 +2,51 @@
 #define PROCESSINGSTACK_HPP
 
 #include <iostream>
-#include <vector>
-#include <list>
-#include <cassert>
-#include <sstream>
 #include <stack>
 #include "interpreter.hpp"
+#include "RecursiveDescentParser.hpp"
 
 using namespace std;
 
-//Linked list node
-
+// Linked list node
 struct Processing_Node {
-    //Can add a data variable here need to figure out the type
-    int data; 
-    //Pointer to the next node in our stack
-    Node* next;
+    // Pointer to the AST node
+    LCRS* astNode;
+    // Pointer to the next node in the stack
+    Processing_Node* next;
 
-    //Constructor for the node 
-    Processing_Node(int val) : data(val), next(nullptr) {}
+    // Constructor for the node
+    Processing_Node(LCRS* node) : astNode(node), next(nullptr) {}
 };
 
 /*
 *   This is our stack where we will be handling all the pushing and popping
 *   
 */
-class ProcessingStack{
+class ProcessingStack {
+public:
+    // Initializer
+    ProcessingStack() : head(nullptr) {}
 
-    public:
-        //Initialzier
-        ProcessingStack() : head(nullptr) {};
+    // Push
+    void Push(LCRS* new_data);
 
-        //Push 
-        void Push(int new_data);
-        
-        //Pop 
-        //We will need to change the data type to match what we need it to return
-        void Pop();
+    // Pop
+    void Pop();
 
-        // Evaluate an expression represented as a string
-        int evaluateExpression(const string& expression);
+    // Evaluate an expression represented as an AST node
+    int evaluateExpression(const LCRS* node);
 
-        //Clean up the stack once it is no longer needed. Free the memory
-        ~ProcessingStack()
-        {
-            while(head!=nullptr)
-            {
-                Pop();
-            }
+    // Clean up the stack once it is no longer needed. Free the memory
+    ~ProcessingStack() {
+        while (head != nullptr) {
+            Pop();
         }
+    }
 
-    private:
-        
-        //Pointer to the head of the stack
-        Processing_Node* head;
+private:
+    // Pointer to the head of the stack
+    Processing_Node* head;
 };
 
 #endif /* PROCESSINGSTACK_HPP */
