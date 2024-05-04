@@ -63,5 +63,6 @@ private:
     
     
 };
-
-#endif // INTERPRETER_HPP
+*/
+};
+#endif // INTERPRETER_HPP 
