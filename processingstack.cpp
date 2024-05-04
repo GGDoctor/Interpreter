@@ -42,7 +42,7 @@ void ProcessingStack::Push(int new_data)
 //		5. evaluate n + n
 //		6. push "n + n" (the result) on the stack. It should be a number.
 
-//please help actually getting our tokens linked.
+//Hey ya'll I need help linking the AST to this
 int ProcessingStack::evaluateExpression(const string& expression) {
     istringstream iss(expression);
     stack<int> operands;
