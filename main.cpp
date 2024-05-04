@@ -53,9 +53,9 @@ int main(int argc, char *argv[]) {
     ss2 << recursiveDescentParser;
     */
     SymbolTable symbolTable(recursiveDescentParser);
-    cout << symbolTable;
+    // cout << symbolTable;
 
-    cout << "\n\n\n\n\n";
+    // cout << "\n\n\n\n\n";
 
     AbstractSyntaxTree abstractSyntaxTree(recursiveDescentParser, symbolTable);
     //cout << abstractSyntaxTree;
@@ -65,5 +65,6 @@ int main(int argc, char *argv[]) {
     interpreter.printAstBySymbolTable();
     interpreter.printCstBySymbolTable();
 
+    //interpreter.executeStack();
     return 0;
 }
