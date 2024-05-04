@@ -20,7 +20,16 @@ void Stack::Pop()
  *   Arguemnt: Whatever we are passing it
  *   returns nothing
  */
-void Stack::Push(int new_data)
+// void Stack::Push(int new_data)
+// {
+//     // Add the new node to the top of the stack
+//     Node *new_node = new Node(new_data);
+//     new_node->next = head;
+//     head = new_node;
+//     return;
+// }
+
+void Stack::Push(Token new_data)
 {
     // Add the new node to the top of the stack
     Node *new_node = new Node(new_data);
@@ -29,14 +38,27 @@ void Stack::Push(int new_data)
     return;
 }
 
-int Stack::Top()
+// int Stack::Top()
+// {
+//     // Check if head is null and add the new node if it is
+//     if (head == nullptr)
+//     {
+//         assert(head != nullptr);
+//         cerr << "Head is null and you are breaking the code!!!" << endl;
+//         return -1;
+//     }
+
+//     return head->data;
+// }
+
+Token Stack::Top()
 {
     // Check if head is null and add the new node if it is
     if (head == nullptr)
     {
         assert(head != nullptr);
         cerr << "Head is null and you are breaking the code!!!" << endl;
-        return -1;
+        //return nullptr;
     }
 
     return head->data;
