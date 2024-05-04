@@ -2,7 +2,7 @@
 CC = g++ -std=c++17
 
 # Source files
-SRCS = IgnoreComments.cpp Tokenization.cpp RecursiveDescentParser.cpp symboltable.cpp abstractsyntaxtree.cpp infixtopostfix.cpp interpreter.cpp main.cpp
+SRCS = IgnoreComments.cpp Tokenization.cpp RecursiveDescentParser.cpp symboltable.cpp abstractsyntaxtree.cpp infixtopostfix.cpp processingstack.cpp interpreter.cpp main.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
