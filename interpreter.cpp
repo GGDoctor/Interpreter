@@ -222,14 +222,15 @@ void Interpreter::printCstByAst() {
 }
 
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
-    for(auto[entry, cstNode]:cstSym){
+    for(auto[entry, astNode]:astSym){
         ProcessingStack workingStack;
         //iterates through the cst to grab every token in the line
         if(entry.identifierName == "main"){
-            while(cstNode){
+            while(astNode){
                 //workingStack.Push(cstNode);
-                cout << cstNode->token.character << " ";
-                cstNode = cstNode->rightSibling;
+                cout << astNode->token.character << " ";
+                astNode = astNode->rightSibling;
+                cout << cstAst.at(ast)->token.character << endl;
                 }
                 cout << endl;
             }
