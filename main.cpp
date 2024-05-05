@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
     
     Interpreter interpreter(abstractSyntaxTree, recursiveDescentParser, symbolTable);
     //interpreter.printAstCstBySymbolTable();
-    interpreter.printAstBySymbolTable();
-    interpreter.printCstBySymbolTable();
+    // interpreter.printAstBySymbolTable();
+    // interpreter.printCstBySymbolTable();
 
     //interpreter.executeStack();
     return 0;

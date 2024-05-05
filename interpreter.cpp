@@ -104,7 +104,7 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
                 }
-                //maps the data CHAAR table entry to the node of either the _cst and _ast
+                //maps the data CHAR table entry to the node of either the _cst and _ast
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
 
@@ -184,78 +184,94 @@ void Interpreter::printAstBySymbolTable() {
 
 
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
-    for(auto[entry, astNode]:astSym){
-        if(entry.identifierName == "main"){
-            //cout << "TEST " << cstAst.at(astNode)->token.lineNumber << endl;
-            cout << "TEST " << cstSym.at(entry)->token.character << endl;
-        }
+    for(auto[astNode, cstNode]:cstAst){
+        ProcessingStack workingStack;
+        //iterates through the cst to grab every token in the line
+
+        while(cstNode){
+            workingStack.Push(cstNode);
+            //cout << cstNode->token.character << " ";
+            cstNode = cstNode->rightSibling;
+            }
+            //cout << endl;
+        executeStack(workingStack);
     }
 }
 
 
 
 
-void Interpreter::executeStack(/*Stack testStack*/){
-    Stack enteredStack;
+void Interpreter::executeStack(ProcessingStack workingStack){
+    while(workingStack.head != nullptr){
+        cout << workingStack.Top()->astNode->token.character << " ";
+        Processing_Node* temp;
+        temp = workingStack.head->next;
+        //workingStack.Pop();
+         workingStack.head = temp;
+    }
+    cout << '\n';
     
-    Token mockToken1;
-    mockToken1.character = "1";
-    mockToken1.type = INTEGER;
-    mockToken1.lineNumber = 1;
+    
+    // Stack enteredStack;
+    
+    // Token mockToken1;
+    // mockToken1.character = "1";
+    // mockToken1.type = INTEGER;
+    // mockToken1.lineNumber = 1;
 
-    Token mockToken2;
-    mockToken2.character = "3";
-    mockToken2.type = INTEGER;
-    mockToken2.lineNumber = 1;
+    // Token mockToken2;
+    // mockToken2.character = "3";
+    // mockToken2.type = INTEGER;
+    // mockToken2.lineNumber = 1;
 
-    Token mockToken3;
-    mockToken3.character = "+";
-    mockToken3.type = PLUS;
-    mockToken3.lineNumber = 1;
+    // Token mockToken3;
+    // mockToken3.character = "+";
+    // mockToken3.type = PLUS;
+    // mockToken3.lineNumber = 1;
 
-    Token mockToken4;
-    mockToken4.character = "2";
-    mockToken4.type = INTEGER;
-    mockToken4.lineNumber = 1;
+    // Token mockToken4;
+    // mockToken4.character = "2";
+    // mockToken4.type = INTEGER;
+    // mockToken4.lineNumber = 1;
 
-    Token mockToken5;
-    mockToken5.character = "*";
-    mockToken5.type = ASTERISK;
-    mockToken5.lineNumber = 1;
+    // Token mockToken5;
+    // mockToken5.character = "*";
+    // mockToken5.type = ASTERISK;
+    // mockToken5.lineNumber = 1;
 
-    enteredStack.Push(mockToken5);
-    enteredStack.Push(mockToken4);
-    enteredStack.Push(mockToken3);
-    enteredStack.Push(mockToken2);
-    enteredStack.Push(mockToken1);
+    // enteredStack.Push(mockToken5);
+    // enteredStack.Push(mockToken4);
+    // enteredStack.Push(mockToken3);
+    // enteredStack.Push(mockToken2);
+    // enteredStack.Push(mockToken1);
 
-    Stack mockStack;
+    // Stack mockStack;
 
-    while (enteredStack.head != nullptr)
-    {
-        if(enteredStack.Top().type == INTEGER){
-            mockStack.Push(enteredStack.Top());
+    // while (enteredStack.head != nullptr)
+    // {
+    //     if(enteredStack.Top().type == INTEGER){
+    //         mockStack.Push(enteredStack.Top());
 
-            cout << "Integer Found: " << enteredStack.Top().character << endl;
-            enteredStack.head = enteredStack.head->next;
+    //         cout << "Integer Found: " << enteredStack.Top().character << endl;
+    //         enteredStack.head = enteredStack.head->next;
 
 
-        }
-        else if(enteredStack.Top().type == PLUS){
-            mockStack.Push(enteredStack.Top());
-            //mockStack.Push(executeNumericalExpression(mockStack));
-            cout << "Plus Found: " << enteredStack.Top().character << endl;
-            enteredStack.head = enteredStack.head->next;
-        }
-        else if(enteredStack.Top().type == ASTERISK){
-            mockStack.Push(enteredStack.Top());
-            cout << "Asterisk Found: " << enteredStack.Top().character << endl;
+    //     }
+    //     else if(enteredStack.Top().type == PLUS){
+    //         mockStack.Push(enteredStack.Top());
+    //         //mockStack.Push(executeNumericalExpression(mockStack));
+    //         cout << "Plus Found: " << enteredStack.Top().character << endl;
+    //         enteredStack.head = enteredStack.head->next;
+    //     }
+    //     else if(enteredStack.Top().type == ASTERISK){
+    //         mockStack.Push(enteredStack.Top());
+    //         cout << "Asterisk Found: " << enteredStack.Top().character << endl;
             
-            enteredStack.head = enteredStack.head->next;
-        }
+    //         enteredStack.head = enteredStack.head->next;
+    //     }
 
         
-    }
+    // }
     
 
 }

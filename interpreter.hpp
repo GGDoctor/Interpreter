@@ -5,6 +5,7 @@
 #include "symboltable.hpp"
 #include "RecursiveDescentParser.hpp"
 #include "stack.hpp"
+#include "processingstack.hpp"
 //#include <stack>
 #include <vector>
 #include <unordered_map> 
@@ -15,7 +16,7 @@ public:
 
     void printAstBySymbolTable();
     void printCstBySymbolTable();
-    void executeStack(/*Stack testStack*/);
+    void executeStack(ProcessingStack workingStack);
     
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
@@ -73,5 +74,5 @@ private:
 };
 
 
-#endif INTERPRETER_HPP
+#endif //INTERPRETER_HPP
 
