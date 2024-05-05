@@ -4,6 +4,7 @@
 #include "abstractsyntaxtree.hpp"
 #include "symboltable.hpp"
 #include "RecursiveDescentParser.hpp"
+#include <iostream>
 #include <stack>
 #include <vector>
 #include <unordered_map> 
@@ -11,9 +12,9 @@
 class Interpreter {
 public:
     Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable);
-
-    void printAstBySymbolTable();
-    void printCstBySymbolTable();
+    void execute();
+    void printAstCstBySymbolTable();
+    void printCstByAst();
     
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
@@ -60,7 +61,7 @@ private:
     int evaluatePostfixExpression(const std::vector<Token>& tokens); // Evaluate postfix expressions
     void handleFunctionCall(LCRS* node); // Handle function calls
     void updateProgramCounter(LCRS* node); // Update program counter based on control structures
-    
+    */
     
 };
 
