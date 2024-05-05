@@ -14,8 +14,8 @@ class Interpreter {
 public:
     Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable);
 
-    void printAstBySymbolTable();
-    void printCstBySymbolTable();
+    void printAstCstBySymbolTable();
+    void printCstByAst();
     void executeStack(ProcessingStack workingStack);
     
     /*

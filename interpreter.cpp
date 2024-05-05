@@ -15,27 +15,53 @@ Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, Sym
 }
 
 /**
- * @param symbolTableEntry - entry in the symbol table
- * @brief takes a symbol table entry as input and adds it to ast and cst maps
- */
-void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCRS *_cst) {
-    //Create two LCRS's to map to eachother
-    LCRS* abstract = _ast;
-    LCRS* concrete = _cst;
-
-    while (abstract && concrete) {
-        //adds to the map cstByAst with abstract being the Key, and concrete being the value
-        cstByAst[abstract] = concrete;
-        
-        while (abstract->rightSibling) abstract = abstract->rightSibling;
-        while (concrete->rightSibling) concrete = concrete->rightSibling;
-        abstract = abstract->leftChild;
-        concrete = concrete->leftChild;
-    }
-
+  * @param symbolTable - an stl linked list representing our symbol table
+  * @param _ast - the abstract syntax tree
+  * @param _cst - the concrete syntax tree
+  * @brief takes a symbol table entry as input and adds it to ast and cst maps
+  */
+void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, LCRS *cstNode) {
+    LCRS *_ast = astNode;
+    LCRS *_cst = cstNode;
+    LCRS *abstract = astNode;
+    LCRS *concrete = cstNode;
     // used for multiple variables declared on same line seperated by commas
     int commaCounter = 0;
-    
+    bool dontWorryAboutCommas = false;
+
+    while (abstract && concrete) {
+        cstByAst[abstract] = concrete;
+
+        LCRS *tempConcrete = concrete;
+        while (concrete->rightSibling) {
+            if (concrete->token.character == "," && tempConcrete->token.character != "printf") 
+                commaCounter++;
+            concrete = concrete->rightSibling;
+        }
+
+        if (commaCounter > 0) {
+            for (int i = 0; i < commaCounter; i++) {
+                while (abstract->rightSibling) abstract = abstract->rightSibling;
+                abstract = abstract->leftChild;
+                cstByAst[abstract] = tempConcrete;
+            }
+        }
+
+        if (tempConcrete->token.character == "for") {
+            for (int i = 0; i < 2; i++) {
+                while (abstract->rightSibling) abstract = abstract->rightSibling;
+                abstract = abstract->leftChild;
+                cstByAst[abstract] = tempConcrete;
+            }
+        }
+
+        while (abstract->rightSibling) abstract = abstract->rightSibling;
+        if (abstract) abstract = abstract->leftChild;
+        if (concrete) concrete = concrete->leftChild;
+
+        commaCounter = 0;
+    }
+
     for (const auto &entry : symbolTable) {
         if (entry.identifierType == "function") {
 
@@ -45,9 +71,9 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
                 _cst = _cst->leftChild;
                 _ast = _ast->leftChild;
             }
-            //maps the data FUNCTION table entry to the node of either the _cst and _ast
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
+            cstByAst[_ast] = _cst;
 
         } else if (entry.identifierType == "procedure") {
 
@@ -57,7 +83,6 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
                 _cst = _cst->leftChild;
                 _ast = _ast->leftChild;
             }
-            //maps the data PROCEDURE table entry to the node of either the _cst and _ast
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
 
@@ -65,17 +90,20 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
 
             if (entry.datatype == "int") {
 
-                
-                if (commaCounter > 0) commaCounter--;
-                //move all the way to the right, to shift the left child over by one
+                if (commaCounter > 0) {
+                    dontWorryAboutCommas = true;
+                    commaCounter--;
+                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                    if (_ast->leftChild) _ast = _ast->leftChild;
+                }
                 else {
                     while (_cst->rightSibling) _cst = _cst->rightSibling;
                     while (_ast->rightSibling) _ast = _ast->rightSibling;
                     if (_cst->leftChild) _cst = _cst->leftChild;
                     if (_ast->leftChild) _ast = _ast->leftChild;
                 }
+                
 
-                //finds the declaration
                 while (_cst->token.character != "int") {
                     while (_cst->rightSibling) _cst = _cst->rightSibling;
                     while (_ast->rightSibling) _ast = _ast->rightSibling;
@@ -83,28 +111,29 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
                     _ast = _ast->leftChild;
 
                 }
-                //maps the data INT table entry to the node of either the _cst and _ast
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
 
+                
                 LCRS* tempCst = _cst;
                 LCRS* tempAst = _ast;
 
-                //adds to commaCounter in order for more datatypes to be added?
-                while (tempCst->rightSibling) {
-                    if (tempCst->token.character == ",") commaCounter++;
-                    tempCst = tempCst->rightSibling;
+                if (dontWorryAboutCommas && commaCounter == 0) dontWorryAboutCommas = false;
+                else {
+                    while (tempCst->rightSibling) {
+                        if (tempCst->token.character == ",") commaCounter++;
+                        tempCst = tempCst->rightSibling;   
+                    }
                 }
 
             } else if (entry.datatype == "char") {
-                
+
                 while (_cst->token.character != "char") {
                     while (_cst->rightSibling) _cst = _cst->rightSibling;
                     while (_ast->rightSibling) _ast = _ast->rightSibling;
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
                 }
-                //maps the data CHAR table entry to the node of either the _cst and _ast
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
 
@@ -116,7 +145,6 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
                 }
-                //maps the data BOOL table entry to the node of either the _cst and _ast
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
 
@@ -126,36 +154,9 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *_ast, LCR
 
 }
 
-void Interpreter::printCstBySymbolTable() {
-    for (auto [entry, cstNode] : cstBySymbolTable) {
-        cout << "IDENTIFIER_NAME: " << entry.identifierName << '\n';
-        cout << "IDENTIFIER_TYPE: " << entry.identifierType << '\n';
-        cout << "DATATYPE: " << entry.datatype << '\n';
-        cout << "DATATYPE_IS_ARRAY: ";
-        if (entry.datatypeIsArray)
-            cout << "yes\n";
-        else
-            cout << "no\n";
-        cout << "DATATYPE_ARRAY_SIZE: " << entry.datatypeArraySize << '\n';
-        cout << "SCOPE: " << entry.scope << '\n';
-        cout << '\n';
-
-        cout << "\tast line " << cstNode->token.lineNumber << ": ";
-
-        while (cstNode) {
-            cout << cstNode->token.character;
-            if (cstNode->rightSibling) {
-                cout << " -> ";
-            }
-            cstNode = cstNode->rightSibling;
-        }
-
-        cout << "\n\n";
-    }
-}
-
-void Interpreter::printAstBySymbolTable() {
+void Interpreter::printAstCstBySymbolTable() {
     for (auto [entry, astNode] : astBySymbolTable) {
+        LCRS *cstNode = cstByAst[astNode];
         cout << "IDENTIFIER_NAME: " << entry.identifierName << '\n';
         cout << "IDENTIFIER_TYPE: " << entry.identifierType << '\n';
         cout << "DATATYPE: " << entry.datatype << '\n';
@@ -178,10 +179,47 @@ void Interpreter::printAstBySymbolTable() {
             astNode = astNode->rightSibling;
         }
 
+        cout << "\n\tcst line " << cstNode->token.lineNumber << ": ";
+
+        while (cstNode) {
+            cout << cstNode->token.character;
+            if (cstNode->rightSibling) {
+                cout << " -> ";
+            }
+            cstNode = cstNode->rightSibling;
+        }
+
         cout << "\n\n";
     }
 }
 
+void Interpreter::printCstByAst() {
+    for (auto &[astNode, cstNode] : cstByAst) {
+        LCRS *_ast = astNode;
+        LCRS *_cst = cstNode;
+        cout << "ast line " << _ast->token.lineNumber << ": ";
+
+        while (_ast) {
+            cout << _ast->token.character;
+            if (_ast->rightSibling) {
+                cout << " -> ";
+            }
+            _ast = _ast->rightSibling;
+        }
+
+        cout << "\ncst line " << _cst->token.lineNumber << ": ";
+
+        while (_cst) {
+            cout << _cst->token.character;
+            if (_cst->rightSibling) {
+                cout << " -> ";
+            }
+            _cst = _cst->rightSibling;
+        }
+
+        cout << "\n\n";
+    }
+}
 
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
     for(auto[astNode, cstNode]:cstAst){

@@ -381,12 +381,13 @@ AbstractSyntaxTree::AbstractSyntaxTree(RecursiveDescentParser concreteSyntaxTree
                 Token proxyToken;
                 proxyToken.character = "For Expression " + to_string(count);
                 proxyToken.type = result[i][0].type;
+                proxyToken.lineNumber = result[i][0].lineNumber;
                 proxyVector.push_back(proxyToken);
 
                 Token proxyTokenTwo;
                 proxyTokenTwo.character = "\n";
                 proxyTokenTwo.type = result[i][0].type;
-                
+                proxyTokenTwo.lineNumber = result[i][0].lineNumber;
                 result[i].push_back(proxyTokenTwo);                
                               
                 for (int r = 2; r < result[i].size(); r++)

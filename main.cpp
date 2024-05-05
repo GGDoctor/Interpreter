@@ -65,6 +65,10 @@ int main(int argc, char *argv[]) {
     // interpreter.printAstBySymbolTable();
     // interpreter.printCstBySymbolTable();
 
+    interpreter.printCstByAst();
+    cout << "\n\n\n\n";
+    interpreter.printAstCstBySymbolTable();
+
     //interpreter.executeStack();
     return 0;
 }
