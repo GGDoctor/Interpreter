@@ -273,8 +273,8 @@ void Interpreter::executeStack(ProcessingStack workingStack){
         
     }
     
-    cout << endl;
-} */
+    cout << endl; */
+} 
 
 // Token Interpreter::executeNumericalExpression(Stack numberStack){
 
