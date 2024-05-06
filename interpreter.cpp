@@ -268,11 +268,11 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
         }
         
         if(abstractSyntaxTree->token.character == "Assignment"){
-            cout << "HERE 5" << endl;
+            // cout << "HERE 5" << endl;
             //abstractSyntaxTree = abstractSyntaxTree->rightSibling;
             LCRS* temp = abstractSyntaxTree;
             while(temp){
-                cout << "HERE 6 " << temp->token.character << endl;
+                // cout << "HERE 6 " << temp->token.character << endl;
                 workingStack.Push(temp);
                 temp = temp->rightSibling;
             }
@@ -280,11 +280,11 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
             doMath(workingStack, entry.scope);
         }
         if(abstractSyntaxTree->rightSibling == nullptr){
-            cout << "HERE 7" << endl;
+            // cout << "HERE 7" << endl;
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
         else{
-            cout << "HERE 8" << endl;
+            // cout << "HERE 8" << endl;
             abstractSyntaxTree = abstractSyntaxTree->rightSibling;
         }
     }
@@ -297,15 +297,34 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope){
     //operation to the 2 most recent numbers in the numberStack. However we have no way of storing
     //values for the variables.
     while(workingStack.Top()){
-        cout << workingStack.Top()->astNode->token.character << " ";
+        cout << workingStack.Top()->astNode->token.character << endl;
+        if(workingStack.Top()->astNode->token.character=="Assignment")
+        {
+            Processing_Node* obj1;
+            Processing_Node* obj2;
+            workingStack.Pop();
+
+            obj1->astNode->token.character = workingStack.Top()->astNode->token.character;
+            workingStack.Pop();
+            obj2->astNode->token.character = workingStack.Top()->astNode->token.character;
+            workingStack.Pop();
+            if (workingStack.Top()->astNode->token.character=="=")
+            {
+                cout << "Obj2" << obj2->astNode->token.character;
+                workingStack.Pop();
+                  
+            }
+
+        }
         // for(auto[entry,astNode]:astBySymbolTable){
         //     if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
         //     //numberStack.Push(stoi(entry.));
         //     }
         // }
-        workingStack.Pop();
+
+        // workingStack.Pop();
+
     }
-    cout << endl;
 }
 
 // Token Interpreter::executeNumericalExpression(Stack numberStack){
