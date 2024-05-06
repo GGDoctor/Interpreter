@@ -11,6 +11,7 @@
 #include "abstractsyntaxtree.hpp"
 #include "interpreter.hpp"
 #include "infixtopostfix.cpp"
+#include "processingstack.hpp"
 #include <iostream>
 #include <sstream>
 

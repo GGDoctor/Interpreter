@@ -40,7 +40,8 @@ public:
      * @param token - A token from the input vector of tokens 
      */
     LCRS(const Token& token) : token(token), leftChild(nullptr), rightSibling(nullptr) { }
-
+    friend class Interpreter;
+    friend class ProcessingStack;
     /**
      * @brief Breadth-first search function
      * @returns A string with the resulting BFS
