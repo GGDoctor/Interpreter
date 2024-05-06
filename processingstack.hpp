@@ -26,7 +26,10 @@ struct Processing_Node {
 class ProcessingStack {
 public:
     // Initializer
-    ProcessingStack() : head(nullptr) {}
+    ProcessingStack(){
+        head = nullptr;
+        tail = nullptr;
+    }
 
     // Push
     void Push(LCRS* new_data);
@@ -50,6 +53,7 @@ public:
     friend class Interpreter;
 private:
     // Pointer to the head of the stack
+    Processing_Node* tail;
     Processing_Node* head;
 };
 

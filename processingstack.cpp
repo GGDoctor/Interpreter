@@ -9,8 +9,17 @@ void ProcessingStack::Pop()
         cerr << "Stack is empty and you are trying to pop" << endl;
         exit(EXIT_FAILURE);
     }
-
     Processing_Node* temp = head;
+    while(temp->next != nullptr){
+        if(temp->next == tail){
+            temp = tail;
+            tail = temp;
+        }
+        if(temp->next != nullptr){
+            temp = temp->next;
+        }
+    }
+    
     head = head->next;
     delete temp;
 }
@@ -19,8 +28,15 @@ void ProcessingStack::Push(LCRS* new_data)
 {
     // Add the new node to the top of the stack
     Processing_Node* new_node = new Processing_Node(new_data);
-    new_node->next = head;
-    head = new_node;
+    Processing_Node* temp = tail;
+    if(tail == nullptr){
+        tail = new_node;
+        head = tail;
+    }
+    else{
+        tail->next = new_node;
+        tail = new_node;
+    }
 }
 
 
