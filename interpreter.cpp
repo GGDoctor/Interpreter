@@ -1,26 +1,26 @@
 #include "interpreter.hpp"
 using namespace std;
 
-
-Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable) {
+Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable)
+{
     this->ast = ast.getAbstractSyntaxTree();
     this->cst = cst.getConcreteSyntaxTree();
-    LCRS* abstract = this->ast;
-    LCRS* concrete = this->cst;
+    LCRS *abstract = this->ast;
+    LCRS *concrete = this->cst;
 
     populateMappings(symbolTable.table, abstract, concrete);
 
     iterateMaps(astBySymbolTable, cstBySymbolTable, cstByAst);
-
 }
 
 /**
-  * @param symbolTable - an stl linked list representing our symbol table
-  * @param _ast - the abstract syntax tree
-  * @param _cst - the concrete syntax tree
-  * @brief takes a symbol table entry as input and adds it to ast and cst maps
-  */
-void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, LCRS *cstNode) {
+ * @param symbolTable - an stl linked list representing our symbol table
+ * @param _ast - the abstract syntax tree
+ * @param _cst - the concrete syntax tree
+ * @brief takes a symbol table entry as input and adds it to ast and cst maps
+ */
+void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, LCRS *cstNode)
+{
     LCRS *_ast = astNode;
     LCRS *_cst = cstNode;
     LCRS *abstract = astNode;
@@ -29,133 +29,175 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
     int commaCounter = 0;
     bool dontWorryAboutCommas = false;
 
-    while (abstract && concrete) {
+    while (abstract && concrete)
+    {
         cstByAst[abstract] = concrete;
 
         LCRS *tempConcrete = concrete;
-        while (concrete->rightSibling) {
-            if (concrete->token.character == "," && tempConcrete->token.character != "printf") 
+        while (concrete->rightSibling)
+        {
+            if (concrete->token.character == "," && tempConcrete->token.character != "printf")
                 commaCounter++;
             concrete = concrete->rightSibling;
         }
 
-        if (commaCounter > 0) {
-            for (int i = 0; i < commaCounter; i++) {
-                while (abstract->rightSibling) abstract = abstract->rightSibling;
+        if (commaCounter > 0)
+        {
+            for (int i = 0; i < commaCounter; i++)
+            {
+                while (abstract->rightSibling)
+                    abstract = abstract->rightSibling;
                 abstract = abstract->leftChild;
                 cstByAst[abstract] = tempConcrete;
             }
         }
 
-        if (tempConcrete->token.character == "for") {
-            for (int i = 0; i < 2; i++) {
-                while (abstract->rightSibling) abstract = abstract->rightSibling;
+        if (tempConcrete->token.character == "for")
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                while (abstract->rightSibling)
+                    abstract = abstract->rightSibling;
                 abstract = abstract->leftChild;
                 cstByAst[abstract] = tempConcrete;
             }
         }
 
-        while (abstract->rightSibling) abstract = abstract->rightSibling;
-        if (abstract) abstract = abstract->leftChild;
-        if (concrete) concrete = concrete->leftChild;
+        while (abstract->rightSibling)
+            abstract = abstract->rightSibling;
+        if (abstract)
+            abstract = abstract->leftChild;
+        if (concrete)
+            concrete = concrete->leftChild;
 
         commaCounter = 0;
     }
 
-    for (const auto &entry : symbolTable) {
-        if (entry.identifierType == "function") {
+    for (const auto &entry : symbolTable)
+    {
+        if (entry.identifierType == "function")
+        {
 
-            while (_cst->token.character != "function") {
-                while (_cst->rightSibling) _cst = _cst->rightSibling;
-                while (_ast->rightSibling) _ast = _ast->rightSibling;
+            while (_cst->token.character != "function")
+            {
+                while (_cst->rightSibling)
+                    _cst = _cst->rightSibling;
+                while (_ast->rightSibling)
+                    _ast = _ast->rightSibling;
                 _cst = _cst->leftChild;
                 _ast = _ast->leftChild;
             }
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
             cstByAst[_ast] = _cst;
+        }
+        else if (entry.identifierType == "procedure")
+        {
 
-        } else if (entry.identifierType == "procedure") {
-
-            while (_cst->token.character != "procedure") {
-                while (_cst->rightSibling) _cst = _cst->rightSibling;
-                while (_ast->rightSibling) _ast = _ast->rightSibling;
+            while (_cst->token.character != "procedure")
+            {
+                while (_cst->rightSibling)
+                    _cst = _cst->rightSibling;
+                while (_ast->rightSibling)
+                    _ast = _ast->rightSibling;
                 _cst = _cst->leftChild;
                 _ast = _ast->leftChild;
             }
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
+        }
+        else if (entry.identifierType == "datatype")
+        {
 
-        } else if (entry.identifierType == "datatype") {
+            if (entry.datatype == "int")
+            {
 
-            if (entry.datatype == "int") {
-
-                if (commaCounter > 0) {
+                if (commaCounter > 0)
+                {
                     dontWorryAboutCommas = true;
                     commaCounter--;
-                    while (_ast->rightSibling) _ast = _ast->rightSibling;
-                    if (_ast->leftChild) _ast = _ast->leftChild;
+                    while (_ast->rightSibling)
+                        _ast = _ast->rightSibling;
+                    if (_ast->leftChild)
+                        _ast = _ast->leftChild;
                 }
-                else {
-                    while (_cst->rightSibling) _cst = _cst->rightSibling;
-                    while (_ast->rightSibling) _ast = _ast->rightSibling;
-                    if (_cst->leftChild) _cst = _cst->leftChild;
-                    if (_ast->leftChild) _ast = _ast->leftChild;
+                else
+                {
+                    while (_cst->rightSibling)
+                        _cst = _cst->rightSibling;
+                    while (_ast->rightSibling)
+                        _ast = _ast->rightSibling;
+                    if (_cst->leftChild)
+                        _cst = _cst->leftChild;
+                    if (_ast->leftChild)
+                        _ast = _ast->leftChild;
                 }
-                
 
-                while (_cst->token.character != "int") {
-                    while (_cst->rightSibling) _cst = _cst->rightSibling;
-                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                while (_cst->token.character != "int")
+                {
+                    while (_cst->rightSibling)
+                        _cst = _cst->rightSibling;
+                    while (_ast->rightSibling)
+                        _ast = _ast->rightSibling;
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
-
                 }
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
 
-                
-                LCRS* tempCst = _cst;
-                LCRS* tempAst = _ast;
+                LCRS *tempCst = _cst;
+                LCRS *tempAst = _ast;
 
-                if (dontWorryAboutCommas && commaCounter == 0) dontWorryAboutCommas = false;
-                else {
-                    while (tempCst->rightSibling) {
-                        if (tempCst->token.character == ",") commaCounter++;
-                        tempCst = tempCst->rightSibling;   
+                if (dontWorryAboutCommas && commaCounter == 0)
+                    dontWorryAboutCommas = false;
+                else
+                {
+                    while (tempCst->rightSibling)
+                    {
+                        if (tempCst->token.character == ",")
+                            commaCounter++;
+                        tempCst = tempCst->rightSibling;
                     }
                 }
+            }
+            else if (entry.datatype == "char")
+            {
 
-            } else if (entry.datatype == "char") {
-
-                while (_cst->token.character != "char") {
-                    while (_cst->rightSibling) _cst = _cst->rightSibling;
-                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                while (_cst->token.character != "char")
+                {
+                    while (_cst->rightSibling)
+                        _cst = _cst->rightSibling;
+                    while (_ast->rightSibling)
+                        _ast = _ast->rightSibling;
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
                 }
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
+            }
+            else if (entry.datatype == "bool")
+            {
 
-            } else if (entry.datatype == "bool") {
-
-                while (_cst->token.character != "bool") {
-                    while (_cst->rightSibling) _cst = _cst->rightSibling;
-                    while (_ast->rightSibling) _ast = _ast->rightSibling;
+                while (_cst->token.character != "bool")
+                {
+                    while (_cst->rightSibling)
+                        _cst = _cst->rightSibling;
+                    while (_ast->rightSibling)
+                        _ast = _ast->rightSibling;
                     _cst = _cst->leftChild;
                     _ast = _ast->leftChild;
                 }
                 cstBySymbolTable[entry] = _cst;
                 astBySymbolTable[entry] = _ast;
-
             }
         }
-    }   
-
+    }
 }
 
-void Interpreter::printAstCstBySymbolTable() {
-    for (auto [entry, astNode] : astBySymbolTable) {
+void Interpreter::printAstCstBySymbolTable()
+{
+    for (auto [entry, astNode] : astBySymbolTable)
+    {
         LCRS *cstNode = cstByAst[astNode];
         cout << "IDENTIFIER_NAME: " << entry.identifierName << '\n';
         cout << "IDENTIFIER_TYPE: " << entry.identifierType << '\n';
@@ -171,9 +213,11 @@ void Interpreter::printAstCstBySymbolTable() {
 
         cout << "\tast line " << astNode->token.lineNumber << ": ";
 
-        while (astNode) {
+        while (astNode)
+        {
             cout << astNode->token.character;
-            if (astNode->rightSibling) {
+            if (astNode->rightSibling)
+            {
                 cout << " -> ";
             }
             astNode = astNode->rightSibling;
@@ -181,9 +225,11 @@ void Interpreter::printAstCstBySymbolTable() {
 
         cout << "\n\tcst line " << cstNode->token.lineNumber << ": ";
 
-        while (cstNode) {
+        while (cstNode)
+        {
             cout << cstNode->token.character;
-            if (cstNode->rightSibling) {
+            if (cstNode->rightSibling)
+            {
                 cout << " -> ";
             }
             cstNode = cstNode->rightSibling;
@@ -193,15 +239,19 @@ void Interpreter::printAstCstBySymbolTable() {
     }
 }
 
-void Interpreter::printCstByAst() {
-    for (auto &[astNode, cstNode] : cstByAst) {
+void Interpreter::printCstByAst()
+{
+    for (auto &[astNode, cstNode] : cstByAst)
+    {
         LCRS *_ast = astNode;
         LCRS *_cst = cstNode;
         cout << "ast line " << _ast->token.lineNumber << ": ";
 
-        while (_ast) {
+        while (_ast)
+        {
             cout << _ast->token.character;
-            if (_ast->rightSibling) {
+            if (_ast->rightSibling)
+            {
                 cout << " -> ";
             }
             _ast = _ast->rightSibling;
@@ -209,9 +259,11 @@ void Interpreter::printCstByAst() {
 
         cout << "\ncst line " << _cst->token.lineNumber << ": ";
 
-        while (_cst) {
+        while (_cst)
+        {
             cout << _cst->token.character;
-            if (_cst->rightSibling) {
+            if (_cst->rightSibling)
+            {
                 cout << " -> ";
             }
             _cst = _cst->rightSibling;
@@ -221,114 +273,131 @@ void Interpreter::printCstByAst() {
     }
 }
 
-void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
-    for(auto[entry, astNode]:astSym){
+void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS *, TableEntryHash> astSym, unordered_map<TableEntry, LCRS *, TableEntryHash> cstSym, unordered_map<LCRS *, LCRS *> cstAst)
+{
+    for (auto [entry, astNode] : astSym)
+    {
         ProcessingStack workingStack;
-        //iterates through the astSym map to find and execute main
-        if(entry.identifierName == "main"){
-            
+        // iterates through the astSym map to find and execute main
+        if (entry.identifierName == "main")
+        {
+
             // while(astNode){
-                
+
             //     //cout << astNode->token.character << " ";
             //     astNode = astNode->rightSibling;
             //     cout << cstAst.at(ast)->token.character << endl;
             //     }
             //     cout << endl;
             executeMain(astNode, entry);
-             }
-            
-            
+        }
     }
 }
-
 
 // Variable newVar;
 //             newVar.scope = entry.scope;
 //             newVar.value_name = entry.identifierName;
 //             newVar.value = 0;
 
-void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
-    //cout << "HERE 1" << endl;
-    //iterate throught the syntax tree in order to start executing each line inside of main
-    while(abstractSyntaxTree){
-        //cout << "HERE 2" << endl;
+void Interpreter::executeMain(LCRS *abstractSyntaxTree, TableEntry entry)
+{
+    // cout << "HERE 1" << endl;
+    // iterate throught the syntax tree in order to start executing each line inside of main
+    while (abstractSyntaxTree)
+    {
+        // cout << "HERE 2" << endl;
         ProcessingStack workingStack;
-        //find the assignment type and does whatever math it needs to do to reassign each value.
-        if(abstractSyntaxTree->token.character == "Declaration"){
+        // find the assignment type and does whatever math it needs to do to reassign each value.
+        if (abstractSyntaxTree->token.character == "Declaration")
+        {
             Variable newVar;
             newVar.scope = entry.scope;
             newVar.value_name = entry.identifierName;
             newVar.value = 0;
 
             variables.push_back(newVar);
-                
-            //cout << variables.size() << endl;
-            
-            
+
+            // cout << variables.size() << endl;
         }
-        
-        if(abstractSyntaxTree->token.character == "Assignment"){
+
+        if (abstractSyntaxTree->token.character == "Assignment")
+        {
             // cout << "HERE 5" << endl;
-            //abstractSyntaxTree = abstractSyntaxTree->rightSibling;
-            LCRS* temp = abstractSyntaxTree;
+            // abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+            LCRS *temp = abstractSyntaxTree;
             temp = temp->rightSibling;
-            while(temp){
+            while (temp)
+            {
                 // cout << "HERE 6 " << temp->token.character << endl;
                 workingStack.Push(temp);
                 temp = temp->rightSibling;
-                
             }
             cout << "Going into math " << workingStack.head->astNode->token.character << endl;
             doMath(workingStack, entry.scope);
         }
-        if(abstractSyntaxTree->rightSibling == nullptr){
+        if (abstractSyntaxTree->rightSibling == nullptr)
+        {
             // cout << "HERE 7" << endl;
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
-        else{
+        else
+        {
             // cout << "HERE 8" << endl;
             abstractSyntaxTree = abstractSyntaxTree->rightSibling;
         }
     }
-} 
+}
 
-void Interpreter::doMath(ProcessingStack workingStack, int scope){
-    Stack numberStack;
-    //this doesn't work. But math wise, it is supposed to iterate through the working stack and add the
-    //value of each variable to number stack. When it finds an operator, it will perform that specific
-    //operation to the 2 most recent numbers in the numberStack. However we have no way of storing
-    //values for the variables.
-    vector<Processing_Node> obj;
-    Processing_Node* obj1;
-    Processing_Node* obj2;
-    int j = 0; //Reference to variable vector
-    int value = 0;
-    while(workingStack.Top()){
-        cout << workingStack.Top()->astNode->token.character << endl;
-       
-       for(int i = 0; i < variables.size(); i++){
-            if(variables.at(i).value_name==workingStack.Top()->astNode->token.character)
-            {
-                j = i;   
-            }
-       }
-       if(workingStack.Top()->astNode->token.character!=variables.at(j).value_name)
-       {
-            obj1 = workingStack.Top()->astNode->token.character;
-            workingStack.Pop();
-            obj2 = workingStack.Top()->astNode->token.character;
-            
-       }
-
-        // for(auto[entry,astNode]:astBySymbolTable){
-        //     if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
-        //     //numberStack.Push(stoi(entry.));
-        //     }
-        // }
-
-        workingStack.Pop();
-
+void Interpreter::doMath(ProcessingStack workingStack, int scope)
+{
+    vector<int> maths;
+    cout << scope << endl;
+    
+    // this doesn't work. But math wise, it is supposed to iterate through the working stack and add the
+    // value of each variable to number stack. When it finds an operator, it will perform that specific
+    // operation to the 2 most recent numbers in the numberStack. However we have no way of storing
+    // values for the variables.
+    int returnVar = 0;
+    for (int j = 0; j < variables.size(); j++){
+        cout << variables.at(j).value_name;
     }
+    for (int varz = 1; varz < variables.size(); varz ++)
+    {
+        cout << workingStack.Top()->astNode->token.character << endl;
+        cout << variables.at(varz).value_name << endl;
+        if(variables.at(varz).value_name == workingStack.Top()->astNode->token.character)
+        {
+            maths.push_back(variables.at(varz).value);
+            returnVar = varz;
+            cout << "in this bitch"  << endl;
+            workingStack.Pop();
+        }
+        
+        else if(stoi(workingStack.Top()->astNode->token.character))
+        {
+            cout << "in here" << endl;
+            maths.push_back(stoi(workingStack.Top()->astNode->token.character));
+            workingStack.Pop();
+        }
+
+        if (workingStack.Top()->astNode->token.character == "=")
+        {
+            maths.at(0) = maths.at(1);
+            variables.at(returnVar).value = maths.at(0);
+            workingStack.Pop();
+        }
+    }
+    
+   
+    
+    // for (auto [entry, astNode] : astBySymbolTable)
+    // {
+    //     if ((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope))
+    //     {
+    //         // numberStack.Push(stoi(entry.));
+    //     }
+    // }
+
 }
 
 // Token Interpreter::executeNumericalExpression(Stack numberStack){
@@ -432,5 +501,3 @@ int main() {
 
 //     return 0;
 // }
-
-
