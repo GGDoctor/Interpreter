@@ -14,7 +14,7 @@ Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, Sym
 
 }
 
-/**
+/** Fix Haleys Code :)
   * @param symbolTable - an stl linked list representing our symbol table
   * @param _ast - the abstract syntax tree
   * @param _cst - the concrete syntax tree
