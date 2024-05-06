@@ -262,7 +262,7 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
 
             variables.push_back(newVar);
                 
-            cout << variables.size() << endl;
+            //cout << variables.size() << endl;
             
             
         }
@@ -271,12 +271,14 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
             // cout << "HERE 5" << endl;
             //abstractSyntaxTree = abstractSyntaxTree->rightSibling;
             LCRS* temp = abstractSyntaxTree;
+            temp = temp->rightSibling;
             while(temp){
                 // cout << "HERE 6 " << temp->token.character << endl;
                 workingStack.Push(temp);
                 temp = temp->rightSibling;
+                
             }
-            
+            cout << "Going into math " << workingStack.head->astNode->token.character << endl;
             doMath(workingStack, entry.scope);
         }
         if(abstractSyntaxTree->rightSibling == nullptr){
@@ -296,33 +298,35 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope){
     //value of each variable to number stack. When it finds an operator, it will perform that specific
     //operation to the 2 most recent numbers in the numberStack. However we have no way of storing
     //values for the variables.
+    vector<Processing_Node> obj;
+    Processing_Node* obj1;
+    Processing_Node* obj2;
+    int j = 0; //Reference to variable vector
+    int value = 0;
     while(workingStack.Top()){
         cout << workingStack.Top()->astNode->token.character << endl;
-        if(workingStack.Top()->astNode->token.character=="Assignment")
-        {
-            Processing_Node* obj1;
-            Processing_Node* obj2;
-            workingStack.Pop();
-
-            obj1->astNode->token.character = workingStack.Top()->astNode->token.character;
-            workingStack.Pop();
-            obj2->astNode->token.character = workingStack.Top()->astNode->token.character;
-            workingStack.Pop();
-            if (workingStack.Top()->astNode->token.character=="=")
+       
+       for(int i = 0; i < variables.size(); i++){
+            if(variables.at(i).value_name==workingStack.Top()->astNode->token.character)
             {
-                cout << "Obj2" << obj2->astNode->token.character;
-                workingStack.Pop();
-                  
+                j = i;   
             }
+       }
+       if(workingStack.Top()->astNode->token.character!=variables.at(j).value_name)
+       {
+            obj1 = workingStack.Top()->astNode->token.character;
+            workingStack.Pop();
+            obj2 = workingStack.Top()->astNode->token.character;
+            
+       }
 
-        }
         // for(auto[entry,astNode]:astBySymbolTable){
         //     if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
         //     //numberStack.Push(stoi(entry.));
         //     }
         // }
 
-        // workingStack.Pop();
+        workingStack.Pop();
 
     }
 }
