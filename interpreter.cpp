@@ -224,97 +224,81 @@ void Interpreter::printCstByAst() {
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS*, TableEntryHash>astSym, unordered_map<TableEntry, LCRS*, TableEntryHash>cstSym, unordered_map<LCRS*, LCRS*>cstAst){
     for(auto[entry, astNode]:astSym){
         ProcessingStack workingStack;
-        //iterates through the cst to grab every token in the line
+        //iterates through the astSym map to find and execute main
         if(entry.identifierName == "main"){
-            while(astNode){
-                //workingStack.Push(cstNode);
-                cout << astNode->token.character << " ";
-                astNode = astNode->rightSibling;
-                cout << cstAst.at(ast)->token.character << endl;
-                }
-                cout << endl;
-            }
-            //executeStack(workingStack);
+            
+            // while(astNode){
+                
+            //     //cout << astNode->token.character << " ";
+            //     astNode = astNode->rightSibling;
+            //     cout << cstAst.at(ast)->token.character << endl;
+            //     }
+            //     cout << endl;
+            executeMain(astNode, entry);
+             }
+            
+            
     }
 }
 
 
+// Variable newVar;
+//             newVar.scope = entry.scope;
+//             newVar.value_name = entry.identifierName;
+//             newVar.value = 0;
 
+void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
+    //cout << "HERE 1" << endl;
+    //iterate throught the syntax tree in order to start executing each line inside of main
+    while(abstractSyntaxTree){
+        //cout << "HERE 2" << endl;
+        ProcessingStack workingStack;
+        //find the assignment type and does whatever math it needs to do to reassign each value.
+        if(abstractSyntaxTree->token.character == "Declaration"){
+            //cout << "HERE 3" << endl;
+            Variable newVar;
+            newVar.scope = entry.scope;
+            newVar.value_name = entry.identifierName;
+            newVar.value = 0;
 
-void Interpreter::executeStack(ProcessingStack workingStack){
-    while(workingStack.head != nullptr){
-        cout << workingStack.Top()->astNode->token.character << " ";
-        Processing_Node* temp;
-        temp = workingStack.head->next;
-        //workingStack.Pop();
-         workingStack.head = temp;
-    }
-    cout << '\n';
-    
-/*    
-    Stack enteredStack;
-    
-    Token mockToken1;
-    mockToken1.character = "1";
-    mockToken1.type = INTEGER;
-    mockToken1.lineNumber = 1;
-
-    Token mockToken2;
-    mockToken2.character = "3";
-    mockToken2.type = INTEGER;
-    mockToken2.lineNumber = 1;
-
-    Token mockToken3;
-    mockToken3.character = "+";
-    mockToken3.type = PLUS;
-    mockToken3.lineNumber = 1;
-
-    Token mockToken4;
-    mockToken4.character = "2";
-    mockToken4.type = INTEGER;
-    mockToken4.lineNumber = 1;
-
-    Token mockToken5;
-    mockToken5.character = "*";
-    mockToken5.type = ASTERISK;
-    mockToken5.lineNumber = 1;
-
-    enteredStack.Push(mockToken5);
-    enteredStack.Push(mockToken4);
-    enteredStack.Push(mockToken3);
-    enteredStack.Push(mockToken2);
-    enteredStack.Push(mockToken1);
-
-    Stack mockStack;
-
-    while (enteredStack.head != nullptr)
-    {
-        if(enteredStack.Top().type == INTEGER){
-            mockStack.Push(enteredStack.Top());
-
-            cout << "Integer Found: " << enteredStack.Top().character << endl;
-            enteredStack.head = enteredStack.head->next;
-
-
-        }
-        else if(enteredStack.Top().type == PLUS){
-            mockStack.Push(enteredStack.Top());
-            //mockStack.Push(executeNumericalExpression(mockStack));
-            cout << "Plus Found: " << enteredStack.Top().character << endl;
-            enteredStack.head = enteredStack.head->next;
-        }
-        else if(enteredStack.Top().type == ASTERISK){
-            mockStack.Push(enteredStack.Top());
-            cout << "Asterisk Found: " << enteredStack.Top().character << endl;
+            variables.push_back(newVar);
+                
+            cout << variables.size() << endl;
             
-            enteredStack.head = enteredStack.head->next;
+            
         }
-        
-        
+        if(abstractSyntaxTree->rightSibling == nullptr){
+            abstractSyntaxTree = abstractSyntaxTree->leftChild;
+        }
+        else{
+            abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+        }
+        // if(abstractSyntaxTree->token.character == "Assignment"){
+        //     cout << "HERE 5" << endl;
+        //     abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+        //     while(abstractSyntaxTree){
+        //         workingStack.Push(abstractSyntaxTree);
+        //         abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+        //     }
+        //     //doMath(workingStack, scope);
+        // }
     }
-    
-    cout << endl; */
 } 
+
+void Interpreter::doMath(ProcessingStack workingStack, int scope){
+    Stack numberStack;
+    //this doesn't work. But math wise, it is supposed to iterate through the working stack and add the
+    //value of each variable to number stack. When it finds an operator, it will perform that specific
+    //operation to the 2 most recent numbers in the numberStack. However we have no way of storing
+    //values for the variables.
+    while(workingStack.Top()){
+        for(auto[entry,astNode]:astBySymbolTable){
+            if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
+            //numberStack.Push(stoi(entry.));
+            }
+        }
+    }
+}
 
 // Token Interpreter::executeNumericalExpression(Stack numberStack){
 

@@ -10,13 +10,24 @@
 #include <vector>
 #include <unordered_map> 
 
+struct Variable{ 
+    string value_name;
+    int value;
+    int scope;
+    };
+
+
+
 class Interpreter {
 public:
+    
+
     Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable);
 
     void printAstCstBySymbolTable();
     void printCstByAst();
-    void executeStack(ProcessingStack workingStack);
+    void executeMain(LCRS* abstractSyntaxTree, TableEntry entry);
+    void doMath(ProcessingStack workingStack, int scope);
     
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
@@ -26,6 +37,7 @@ private:
     LCRS* ast;
     LCRS* cst;
 
+    vector<Variable> variables;
     /**
      * maps each entry in symbol table to its corresponding node in ast
      */ 

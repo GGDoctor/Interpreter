@@ -23,8 +23,8 @@ void ProcessingStack::Push(LCRS* new_data)
     head = new_node;
 }
 
-/*
 
+/*
 //Work in progress
 int ProcessingStack::evaluateExpression(const LCRS* node) {
     // Handle evaluating an expression represented by an AST node
@@ -59,5 +59,4 @@ int ProcessingStack::evaluateExpression(const LCRS* node) {
         exit(EXIT_FAILURE);
     }
 }
-
 */

@@ -23,12 +23,12 @@ using namespace std;
 
 struct Node {
     //Can add a data variable here need to figure out the type
-    Token data; 
+    int data; 
     //Pointer to the next node in our stack
     Node* next;
 
     //Constructor for the node 
-    Node(Token val) : data(val), next(nullptr) {}
+    Node(int val) : data(val), next(nullptr) {}
 };
 
 /*
@@ -43,7 +43,7 @@ class Stack{
 
         //Push an item onto our theoretical stack
         // void Push(int new_data);
-        void Push(Token new_data);
+        void Push(int new_data);
         
         //Pop an item off our theoretical stack
         //We will need to change the data type to match what we need it to return
@@ -51,7 +51,7 @@ class Stack{
 
         //Get the top item off our theoretical stack
         // int Top();
-        Token Top();
+        int Top();
 
         bool IsBoolean();
 
