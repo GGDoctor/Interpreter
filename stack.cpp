@@ -29,7 +29,7 @@ void Stack::Pop()
 //     return;
 // }
 
-void Stack::Push(Token new_data)
+void Stack::Push(int new_data)
 {
     // Add the new node to the top of the stack
     Node *new_node = new Node(new_data);
@@ -51,7 +51,7 @@ void Stack::Push(Token new_data)
 //     return head->data;
 // }
 
-Token Stack::Top()
+int Stack::Top()
 {
     // Check if head is null and add the new node if it is
     if (head == nullptr)

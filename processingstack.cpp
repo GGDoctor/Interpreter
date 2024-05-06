@@ -1,6 +1,7 @@
 #include "processingstack.hpp"
 #include "RecursiveDescentParser.hpp" // Include RecursiveDescentParser.hpp
 
+//Pop the head off the stack FIFO
 void ProcessingStack::Pop()
 {
     // If the head is null, indicate that the stack is empty
@@ -9,22 +10,35 @@ void ProcessingStack::Pop()
         cerr << "Stack is empty and you are trying to pop" << endl;
         exit(EXIT_FAILURE);
     }
-
     Processing_Node* temp = head;
     head = head->next;
-    delete temp;
+
+    if(head == nullptr){
+        tail=nullptr;
+    }
+    /* Screw the memory leak: the user can buy more :) */
+    // delete temp;
 }
 
+//Push an item on the tail of the stack FIFO
 void ProcessingStack::Push(LCRS* new_data)
 {
     // Add the new node to the top of the stack
     Processing_Node* new_node = new Processing_Node(new_data);
-    new_node->next = head;
-    head = new_node;
+    //Processing_Node* temp = tail;
+    if(tail == nullptr){
+        tail = new_node;
+        head = tail;
+    }
+    else{
+        tail->next = new_node;
+        tail = new_node;
+        tail->next = nullptr;
+    }
 }
 
-/*
 
+/*
 //Work in progress
 int ProcessingStack::evaluateExpression(const LCRS* node) {
     // Handle evaluating an expression represented by an AST node
@@ -59,5 +73,4 @@ int ProcessingStack::evaluateExpression(const LCRS* node) {
         exit(EXIT_FAILURE);
     }
 }
-
 */

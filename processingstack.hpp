@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <stack>
-#include "interpreter.hpp"
+//#include "interpreter.hpp"
 #include "RecursiveDescentParser.hpp"
 
 using namespace std;
@@ -26,13 +26,20 @@ struct Processing_Node {
 class ProcessingStack {
 public:
     // Initializer
-    ProcessingStack() : head(nullptr) {}
+    ProcessingStack(){
+        head = nullptr;
+        tail = nullptr;
+    }
 
     // Push
     void Push(LCRS* new_data);
 
     // Pop
     void Pop();
+
+    Processing_Node* Top(){
+        return head;
+    }
 
     // Evaluate an expression represented as an AST node
     int evaluateExpression(const LCRS* node);
@@ -43,9 +50,10 @@ public:
             Pop();
         }
     }
-
+    friend class Interpreter;
 private:
     // Pointer to the head of the stack
+    Processing_Node* tail;
     Processing_Node* head;
 };
 

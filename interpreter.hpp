@@ -5,17 +5,29 @@
 #include "symboltable.hpp"
 #include "RecursiveDescentParser.hpp"
 #include "stack.hpp"
+#include "processingstack.hpp"
 //#include <stack>
 #include <vector>
 #include <unordered_map> 
 
+struct Variable{ 
+    string value_name;
+    int value;
+    int scope;
+    };
+
+
+
 class Interpreter {
 public:
+    
+
     Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable);
 
-    void printAstBySymbolTable();
-    void printCstBySymbolTable();
-    void executeStack(/*Stack testStack*/);
+    void printAstCstBySymbolTable();
+    void printCstByAst();
+    void executeMain(LCRS* abstractSyntaxTree, TableEntry entry);
+    void doMath(ProcessingStack workingStack, int scope);
     
     /*
     Interpreter(LCRS* ast, SymbolTable symbolTable);
@@ -25,6 +37,7 @@ private:
     LCRS* ast;
     LCRS* cst;
 
+    vector<Variable> variables;
     /**
      * maps each entry in symbol table to its corresponding node in ast
      */ 

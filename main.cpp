@@ -63,9 +63,14 @@ int main(int argc, char *argv[]) {
     
     Interpreter interpreter(abstractSyntaxTree, recursiveDescentParser, symbolTable);
     //interpreter.printAstCstBySymbolTable();
-    interpreter.printAstBySymbolTable();
-    interpreter.printCstBySymbolTable();
-
+    // interpreter.printAstBySymbolTable();
+    // interpreter.printCstBySymbolTable();
+/*
+    interpreter.printCstByAst();
+    cout << "\n\n\n\n";
+    interpreter.printAstCstBySymbolTable();
+*/
+    cout << "FINISHED" << endl;
     //interpreter.executeStack();
     return 0;
 }
