@@ -255,7 +255,6 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
         ProcessingStack workingStack;
         //find the assignment type and does whatever math it needs to do to reassign each value.
         if(abstractSyntaxTree->token.character == "Declaration"){
-            //cout << "HERE 3" << endl;
             Variable newVar;
             newVar.scope = entry.scope;
             newVar.value_name = entry.identifierName;
@@ -267,21 +266,27 @@ void Interpreter::executeMain(LCRS* abstractSyntaxTree, TableEntry entry){
             
             
         }
+        
+        if(abstractSyntaxTree->token.character == "Assignment"){
+            cout << "HERE 5" << endl;
+            //abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+            LCRS* temp = abstractSyntaxTree;
+            while(temp){
+                cout << "HERE 6 " << temp->token.character << endl;
+                workingStack.Push(temp);
+                temp = temp->rightSibling;
+            }
+            
+            doMath(workingStack, entry.scope);
+        }
         if(abstractSyntaxTree->rightSibling == nullptr){
+            cout << "HERE 7" << endl;
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
         else{
+            cout << "HERE 8" << endl;
             abstractSyntaxTree = abstractSyntaxTree->rightSibling;
         }
-        // if(abstractSyntaxTree->token.character == "Assignment"){
-        //     cout << "HERE 5" << endl;
-        //     abstractSyntaxTree = abstractSyntaxTree->rightSibling;
-        //     while(abstractSyntaxTree){
-        //         workingStack.Push(abstractSyntaxTree);
-        //         abstractSyntaxTree = abstractSyntaxTree->rightSibling;
-        //     }
-        //     //doMath(workingStack, scope);
-        // }
     }
 } 
 
@@ -292,12 +297,15 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope){
     //operation to the 2 most recent numbers in the numberStack. However we have no way of storing
     //values for the variables.
     while(workingStack.Top()){
-        for(auto[entry,astNode]:astBySymbolTable){
-            if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
-            //numberStack.Push(stoi(entry.));
-            }
-        }
+        cout << workingStack.Top()->astNode->token.character << " ";
+        // for(auto[entry,astNode]:astBySymbolTable){
+        //     if((entry.identifierName == workingStack.Top()->astNode->token.character) && (entry.scope == scope)){
+        //     //numberStack.Push(stoi(entry.));
+        //     }
+        // }
+        workingStack.Pop();
     }
+    cout << endl;
 }
 
 // Token Interpreter::executeNumericalExpression(Stack numberStack){
