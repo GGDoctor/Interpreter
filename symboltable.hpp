@@ -77,12 +77,22 @@ public:
      */
     friend ostream& operator << (ostream& os, const SymbolTable& obj);
 
+        // Set current variable
+    void setCurrentVariable(const string& variableName);
+  bool isCurrentVariable(const string& variableName) const;
+
+
+    // Get current variable
+    string getCurrentVariable() const;
+
     friend class Interpreter;
 private:
     void parseParams(const vector<string>& params, int scope, const string& 
                                                                 paramListName);
     list<TableEntry> table;
     list<ParamListEntry> paramTable;
+
+    string currentVariable;
     
     friend class AbstractSyntaxTree;
     friend class Interpreter;

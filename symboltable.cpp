@@ -219,16 +219,14 @@ ostream &operator<<(ostream &os, const SymbolTable &obj) {
 
     return os;
 }
-
-void SymbolTable::parseParams(const vector<string> &params, int scope, 
-                                            const string &paramListName) {
+void SymbolTable::parseParams(const vector<string> &params, int scope, const string &paramListName) {
     if (params[0] == "void")
         return;
     ParamListEntry paramListEntry;
     paramListEntry.paramListName = paramListName;
     paramListEntry.scope = scope;
 
-    for ( int j = 0; j < params.size(); ) {
+    for (int j = 0; j < params.size();) {
         if (params[j] == ")")
             break;
         paramListEntry.identifierName = params[j + 1];
@@ -236,18 +234,38 @@ void SymbolTable::parseParams(const vector<string> &params, int scope,
         paramListEntry.datatypeIsArray = false;
         paramListEntry.datatypeArraySize = 0;
 
+        // Check if the identifier matches the current variable
+        if (isCurrentVariable(paramListEntry.identifierName)) {
+            setCurrentVariable(paramListEntry.identifierName);
+        }
+
         // array
         if (params[j + 2] == "[") {
             paramListEntry.datatypeIsArray = true;
             paramListEntry.datatypeArraySize = stoi(params[j + 3]);
             paramTable.push_back(paramListEntry);
             j += 6;
-        }
-        else { // regular variable
+        } else { // regular variable
             paramTable.push_back(paramListEntry);
             j += 3;
         }
     }
+}
+
+// Helper function to check if a given string matches the current variable
+bool SymbolTable::isCurrentVariable(const string& variableName) const {
+    return variableName == currentVariable;
+}
+
+// Set current variable
+void SymbolTable::setCurrentVariable(const string& variableName) {
+    currentVariable = variableName;
+}
+
+// Get current variable
+string SymbolTable::getCurrentVariable() const {
+    return currentVariable;
+}
 
     /*
     // Loop through the parameters
@@ -278,4 +296,4 @@ void SymbolTable::parseParams(const vector<string> &params, int scope,
         }
     }
     */
-}
+//}
