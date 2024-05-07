@@ -78,10 +78,17 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
     for (const auto &entry : symbolTable)
     {
         Variable newVar;
+        FunctionVariable newFuncVar;
         if (entry.identifierType == "function")
         {
+            newFuncVar.scope = entry.scope;
+            newFuncVar.value_name = entry.identifierName;
+            newFuncVar.value = 0;
+            newFuncVar.head = _ast;
+            functionVariables.push_back(newFuncVar);
+
             newVar.scope = entry.scope;
-            newVar.value_name = entry.identifierName;
+            newVar.value_name = _cst->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character;
             newVar.value = 0;
             variables.push_back(newVar);
             while (_cst->token.character != "function")
@@ -93,6 +100,8 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
                 _cst = _cst->leftChild;
                 _ast = _ast->leftChild;
             }
+            
+            
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
             cstByAst[_ast] = _cst;
@@ -296,34 +305,50 @@ void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS *, TableEntryHash> 
         // iterates through the astSym map to find and execute main
         if (entry.identifierName == "main")
         {
-            executeMain(astNode, entry);
+            executeMain(astNode, entry.scope);
         }
     }
 }
 
 
 
-void Interpreter::executeMain(LCRS *abstractSyntaxTree, TableEntry entry)
+void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
 {
     // iterate throught the syntax tree in order to start executing each line inside of main
     while (abstractSyntaxTree)
     {
         ProcessingStack workingStack;
         // find the assignment type and does whatever math it needs to do to reassign each value.
-
-        if (abstractSyntaxTree->token.character == "Assignment")
+        
+        if (abstractSyntaxTree->token.character == "Assignment" || abstractSyntaxTree->token.character == "return" )
         {
+            if(abstractSyntaxTree->token.character == "return"){
+            cout << "ITS HERE I FOUND RETURN" << endl;
             LCRS *temp = abstractSyntaxTree;
-            temp = temp->rightSibling;
             while (temp)
             {
                 workingStack.Push(temp);
                 temp = temp->rightSibling;
             }
             cout << "Going into math " << workingStack.head->astNode->token.character << endl;
-            doMath(workingStack, entry.scope);
+            doMath(workingStack, scope);
+            }
+            else{
+                LCRS *temp = abstractSyntaxTree;
+                temp = temp->rightSibling;
+                while (temp)
+                {
+                    workingStack.Push(temp);
+                    temp = temp->rightSibling;
+                }
+                cout << "Going into math " << workingStack.head->astNode->token.character << endl;
+                doMath(workingStack, scope);
+            }
         }
-        if (abstractSyntaxTree->rightSibling == nullptr)
+        if(abstractSyntaxTree->token.character == "return"){
+            return;
+        }
+        else if(abstractSyntaxTree->rightSibling == nullptr)
         {
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
@@ -344,19 +369,56 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
     // operation to the 2 most recent numbers in the numberStack. However we have no way of storing
     // values for the variables.
     int returnVar = 0;
+    int returnFuncVar = 0;
+    bool firstVar = true;
+    bool firstFuncVar = true;
     while(workingStack.Top()){
         for (int varz = 0; varz < variables.size(); varz ++)
         {
         //cout << "Token character: " <<workingStack.Top()->astNode->token.character << endl;
         //cout << "Variable Name: "<< variables.at(varz).value_name << endl;
-            if((variables.at(varz).value_name == workingStack.Top()->astNode->token.character) /*&& (variables.at(varz).scope == scope)*/)
+            if((variables.at(varz).value_name == workingStack.Top()->astNode->token.character) && (variables.at(varz).scope == scope))
             {
                 maths.push_back(variables.at(varz).value);
-                returnVar = varz;
+                if(firstVar){
+                    returnVar = varz;
+                    firstVar = false;
+                }
+
+                
                 cout << "FOUND VARIABLE: "  << variables.at(varz).value_name << endl;
                 //workingStack.Pop();
                 break;
             }
+        }
+        for(int funcVarz = 0; funcVarz < functionVariables.size(); funcVarz++){
+            if(functionVariables.at(funcVarz).value_name == workingStack.Top()->astNode->token.character){
+                cout << "FOUND FUNCTION VARIABLE " << functionVariables.at(funcVarz).value_name << endl;
+                int paramIndex = 0;
+                int inputIndex = 0;
+                for(int varz = 0; varz < variables.size(); varz ++){
+                    if(((cstByAst.at(functionVariables.at(funcVarz).head)->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character) 
+                    == variables.at(varz).value_name) 
+                    && variables.at(varz).scope == functionVariables.at(funcVarz).scope){
+                        cout << "TEST 1: " << variables.at(varz).value << endl;
+                        paramIndex = varz;
+                    }
+                    else if(((cstByAst.at(functionVariables.at(funcVarz).head)->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character) 
+                    == variables.at(varz).value_name) 
+                    && variables.at(varz).scope != functionVariables.at(funcVarz).scope){
+                        inputIndex = varz;
+                    }
+                }
+                variables.at(paramIndex).value = variables.at(inputIndex).value;
+                cout << "TEST 2: " << variables.at(paramIndex).value << endl;
+                executeMain(functionVariables.at(funcVarz).head, functionVariables.at(funcVarz).scope);
+                maths.push_back(functionVariables.at(funcVarz).value);
+                if(firstFuncVar){
+                    returnFuncVar = funcVarz;
+                    firstFuncVar = false;
+                }
+            }
+
         }
         if(isdigit(workingStack.Top()->astNode->token.character[0]))
         {
@@ -368,42 +430,57 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
         {
             cout << "FOUND EQUAL: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(0) = maths.at(1);
+            maths.pop_back();
             variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "*")
         {
             cout << "FOUND ASTERISK: " << workingStack.Top()->astNode->token.character << endl;
-            // maths.at(0) = maths.at(1);
+            maths.at(maths.size()-2) = maths.at(maths.size()-2) * maths.at(maths.size()-1);
+            maths.pop_back();
             // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "/")
         {
             cout << "FOUND DIVIDE: " << workingStack.Top()->astNode->token.character << endl;
-            // maths.at(0) = maths.at(1);
+            maths.at(maths.size()-2) = maths.at(maths.size()-2) / maths.at(maths.size()-1);
+            maths.pop_back();
             // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "+")
         {
             cout << "FOUND PLUS: " << workingStack.Top()->astNode->token.character << endl;
-            // maths.at(0) = maths.at(1);
+            maths.at(maths.size()-2) = maths.at(maths.size()-2) + maths.at(maths.size()-1);
+            maths.pop_back();
             // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "-")
         {
             cout << "FOUND MINUS: " << workingStack.Top()->astNode->token.character << endl;
-            // maths.at(0) = maths.at(1);
+            maths.at(maths.size()-2) = maths.at(maths.size()-2) - maths.at(maths.size()-1);
+            maths.pop_back();
             // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
+        }
+        else if(workingStack.Top()->astNode->token.character == "return"){
+            cout << "FOUND RETURN" << endl;
+            for(auto variable: variables){
+                if((variable.value_name == workingStack.Top()->next->astNode->token.character) && (variable.scope = functionVariables.at(returnFuncVar).scope)){
+                    functionVariables.at(returnFuncVar).value = variable.value;
+                    return;
+                }
+
+            }
         }
         else{
             //Pops off the top of the stack if a variable was found.
             workingStack.Pop();
         }
-    
+    cout << variables.at(returnVar).value_name << ": " << variables.at(returnVar).value << endl;
     }
     
     // for (auto [entry, astNode] : astBySymbolTable)
