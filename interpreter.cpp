@@ -337,44 +337,74 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, TableEntry entry)
 void Interpreter::doMath(ProcessingStack workingStack, int scope)
 {
     vector<int> maths;
-    cout << scope << endl;
+    //cout << scope << endl;
     
     // this doesn't work. But math wise, it is supposed to iterate through the working stack and add the
     // value of each variable to number stack. When it finds an operator, it will perform that specific
     // operation to the 2 most recent numbers in the numberStack. However we have no way of storing
     // values for the variables.
     int returnVar = 0;
-    for (int j = 0; j < variables.size(); j++){
-        cout << variables.at(j).value_name;
-    }
-    for (int varz = 1; varz < variables.size(); varz ++)
-    {
-        cout << workingStack.Top()->astNode->token.character << endl;
-        cout << variables.at(varz).value_name << endl;
-        if(variables.at(varz).value_name == workingStack.Top()->astNode->token.character)
+    while(workingStack.Top()){
+        for (int varz = 0; varz < variables.size(); varz ++)
         {
-            maths.push_back(variables.at(varz).value);
-            returnVar = varz;
-            cout << "in this bitch"  << endl;
-            workingStack.Pop();
+        //cout << "Token character: " <<workingStack.Top()->astNode->token.character << endl;
+        //cout << "Variable Name: "<< variables.at(varz).value_name << endl;
+            if((variables.at(varz).value_name == workingStack.Top()->astNode->token.character) /*&& (variables.at(varz).scope == scope)*/)
+            {
+                maths.push_back(variables.at(varz).value);
+                returnVar = varz;
+                cout << "FOUND VARIABLE: "  << variables.at(varz).value_name << endl;
+                //workingStack.Pop();
+                break;
+            }
         }
-        
-        else if(stoi(workingStack.Top()->astNode->token.character))
+        if(isdigit(workingStack.Top()->astNode->token.character[0]))
         {
-            cout << "in here" << endl;
+            cout << "FOUND DIGIT: " << stoi(workingStack.Top()->astNode->token.character) << endl;
             maths.push_back(stoi(workingStack.Top()->astNode->token.character));
             workingStack.Pop();
         }
-
-        if (workingStack.Top()->astNode->token.character == "=")
+        else if (workingStack.Top()->astNode->token.character == "=")
         {
+            cout << "FOUND EQUAL: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(0) = maths.at(1);
             variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
-    }
+        else if (workingStack.Top()->astNode->token.character == "*")
+        {
+            cout << "FOUND ASTERISK: " << workingStack.Top()->astNode->token.character << endl;
+            // maths.at(0) = maths.at(1);
+            // variables.at(returnVar).value = maths.at(0);
+            workingStack.Pop();
+        }
+        else if (workingStack.Top()->astNode->token.character == "/")
+        {
+            cout << "FOUND DIVIDE: " << workingStack.Top()->astNode->token.character << endl;
+            // maths.at(0) = maths.at(1);
+            // variables.at(returnVar).value = maths.at(0);
+            workingStack.Pop();
+        }
+        else if (workingStack.Top()->astNode->token.character == "+")
+        {
+            cout << "FOUND PLUS: " << workingStack.Top()->astNode->token.character << endl;
+            // maths.at(0) = maths.at(1);
+            // variables.at(returnVar).value = maths.at(0);
+            workingStack.Pop();
+        }
+        else if (workingStack.Top()->astNode->token.character == "-")
+        {
+            cout << "FOUND MINUS: " << workingStack.Top()->astNode->token.character << endl;
+            // maths.at(0) = maths.at(1);
+            // variables.at(returnVar).value = maths.at(0);
+            workingStack.Pop();
+        }
+        else{
+            //Pops off the top of the stack if a variable was found.
+            workingStack.Pop();
+        }
     
-   
+    }
     
     // for (auto [entry, astNode] : astBySymbolTable)
     // {
