@@ -86,7 +86,7 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
             newFuncVar.value = 0;
             newFuncVar.head = _ast;
             functionVariables.push_back(newFuncVar);
-
+            //grabs the parameter of the function and adds it to the variables vector
             newVar.scope = entry.scope;
             newVar.value_name = _cst->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character;
             newVar.value = 0;
@@ -322,6 +322,7 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
         
         if (abstractSyntaxTree->token.character == "Assignment" || abstractSyntaxTree->token.character == "return" )
         {
+            //executes almost the exact same thing, except it doesn't skip the first token like in "Assignment"
             if(abstractSyntaxTree->token.character == "return"){
             cout << "ITS HERE I FOUND RETURN" << endl;
             LCRS *temp = abstractSyntaxTree;
@@ -345,6 +346,7 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
                 doMath(workingStack, scope);
             }
         }
+        //Returns when a return statement is read, so it doesn't keep reading the rest of the file
         if(abstractSyntaxTree->token.character == "return"){
             return;
         }
@@ -362,12 +364,6 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
 void Interpreter::doMath(ProcessingStack workingStack, int scope)
 {
     vector<int> maths;
-    //cout << scope << endl;
-    
-    // this doesn't work. But math wise, it is supposed to iterate through the working stack and add the
-    // value of each variable to number stack. When it finds an operator, it will perform that specific
-    // operation to the 2 most recent numbers in the numberStack. However we have no way of storing
-    // values for the variables.
     int returnVar = 0;
     int returnFuncVar = 0;
     bool firstVar = true;
@@ -379,7 +375,9 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
         //cout << "Variable Name: "<< variables.at(varz).value_name << endl;
             if((variables.at(varz).value_name == workingStack.Top()->astNode->token.character) && (variables.at(varz).scope == scope))
             {
+                //pushes the value of the variable within scope to the maths vector
                 maths.push_back(variables.at(varz).value);
+                //marks the first variable being the variable that will be changed
                 if(firstVar){
                     returnVar = varz;
                     firstVar = false;
@@ -392,10 +390,12 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             }
         }
         for(int funcVarz = 0; funcVarz < functionVariables.size(); funcVarz++){
+            //searches for a function variable
             if(functionVariables.at(funcVarz).value_name == workingStack.Top()->astNode->token.character){
                 cout << "FOUND FUNCTION VARIABLE " << functionVariables.at(funcVarz).value_name << endl;
                 int paramIndex = 0;
                 int inputIndex = 0;
+                //checks and find the index of the variable of the parameter
                 for(int varz = 0; varz < variables.size(); varz ++){
                     if(((cstByAst.at(functionVariables.at(funcVarz).head)->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character) 
                     == variables.at(varz).value_name) 
@@ -403,15 +403,19 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
                         cout << "TEST 1: " << variables.at(varz).value << endl;
                         paramIndex = varz;
                     }
+                    //checks and finds the index of the input parameter
                     else if(((cstByAst.at(functionVariables.at(funcVarz).head)->rightSibling->rightSibling->rightSibling->rightSibling->rightSibling->token.character) 
                     == variables.at(varz).value_name) 
                     && variables.at(varz).scope != functionVariables.at(funcVarz).scope){
                         inputIndex = varz;
                     }
                 }
+                //sets the function parameter value equal to the input parameter value
                 variables.at(paramIndex).value = variables.at(inputIndex).value;
                 cout << "TEST 2: " << variables.at(paramIndex).value << endl;
+                //will execute the function and updates its value
                 executeMain(functionVariables.at(funcVarz).head, functionVariables.at(funcVarz).scope);
+                // adds the new value to maths vector
                 maths.push_back(functionVariables.at(funcVarz).value);
                 if(firstFuncVar){
                     returnFuncVar = funcVarz;
@@ -428,6 +432,7 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
         }
         else if (workingStack.Top()->astNode->token.character == "=")
         {
+            //sets the first value in maths to the (hypothetically) only other value in maths
             cout << "FOUND EQUAL: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(0) = maths.at(1);
             maths.pop_back();
@@ -439,7 +444,6 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             cout << "FOUND ASTERISK: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(maths.size()-2) = maths.at(maths.size()-2) * maths.at(maths.size()-1);
             maths.pop_back();
-            // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "/")
@@ -447,7 +451,6 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             cout << "FOUND DIVIDE: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(maths.size()-2) = maths.at(maths.size()-2) / maths.at(maths.size()-1);
             maths.pop_back();
-            // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "+")
@@ -455,7 +458,6 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             cout << "FOUND PLUS: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(maths.size()-2) = maths.at(maths.size()-2) + maths.at(maths.size()-1);
             maths.pop_back();
-            // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if (workingStack.Top()->astNode->token.character == "-")
@@ -463,10 +465,10 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             cout << "FOUND MINUS: " << workingStack.Top()->astNode->token.character << endl;
             maths.at(maths.size()-2) = maths.at(maths.size()-2) - maths.at(maths.size()-1);
             maths.pop_back();
-            // variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
         else if(workingStack.Top()->astNode->token.character == "return"){
+            //updates the function value with the value of the return variable;
             cout << "FOUND RETURN" << endl;
             for(auto variable: variables){
                 if((variable.value_name == workingStack.Top()->next->astNode->token.character) && (variable.scope = functionVariables.at(returnFuncVar).scope)){
