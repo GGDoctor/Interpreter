@@ -31,6 +31,8 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
 
     while (abstract && concrete)
     {
+        
+            
         cstByAst[abstract] = concrete;
 
         LCRS *tempConcrete = concrete;
@@ -75,9 +77,13 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
 
     for (const auto &entry : symbolTable)
     {
+        Variable newVar;
         if (entry.identifierType == "function")
         {
-
+            newVar.scope = entry.scope;
+            newVar.value_name = entry.identifierName;
+            newVar.value = 0;
+            variables.push_back(newVar);
             while (_cst->token.character != "function")
             {
                 while (_cst->rightSibling)
@@ -111,6 +117,10 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
 
             if (entry.datatype == "int")
             {
+                newVar.scope = entry.scope;
+                newVar.value_name = entry.identifierName;
+                newVar.value = 0;
+                variables.push_back(newVar);
 
                 if (commaCounter > 0)
                 {
@@ -275,60 +285,38 @@ void Interpreter::printCstByAst()
 
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS *, TableEntryHash> astSym, unordered_map<TableEntry, LCRS *, TableEntryHash> cstSym, unordered_map<LCRS *, LCRS *> cstAst)
 {
+    cout << "Variable List" << endl;
+    for(auto vars: variables){
+        cout << vars.value_name << endl;
+    }
+    
     for (auto [entry, astNode] : astSym)
     {
         ProcessingStack workingStack;
         // iterates through the astSym map to find and execute main
         if (entry.identifierName == "main")
         {
-
-            // while(astNode){
-
-            //     //cout << astNode->token.character << " ";
-            //     astNode = astNode->rightSibling;
-            //     cout << cstAst.at(ast)->token.character << endl;
-            //     }
-            //     cout << endl;
             executeMain(astNode, entry);
         }
     }
 }
 
-// Variable newVar;
-//             newVar.scope = entry.scope;
-//             newVar.value_name = entry.identifierName;
-//             newVar.value = 0;
+
 
 void Interpreter::executeMain(LCRS *abstractSyntaxTree, TableEntry entry)
 {
-    // cout << "HERE 1" << endl;
     // iterate throught the syntax tree in order to start executing each line inside of main
     while (abstractSyntaxTree)
     {
-        // cout << "HERE 2" << endl;
         ProcessingStack workingStack;
         // find the assignment type and does whatever math it needs to do to reassign each value.
-        if (abstractSyntaxTree->token.character == "Declaration")
-        {
-            Variable newVar;
-            newVar.scope = entry.scope;
-            newVar.value_name = entry.identifierName;
-            newVar.value = 0;
-
-            variables.push_back(newVar);
-
-            // cout << variables.size() << endl;
-        }
 
         if (abstractSyntaxTree->token.character == "Assignment")
         {
-            // cout << "HERE 5" << endl;
-            // abstractSyntaxTree = abstractSyntaxTree->rightSibling;
             LCRS *temp = abstractSyntaxTree;
             temp = temp->rightSibling;
             while (temp)
             {
-                // cout << "HERE 6 " << temp->token.character << endl;
                 workingStack.Push(temp);
                 temp = temp->rightSibling;
             }
@@ -337,12 +325,10 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, TableEntry entry)
         }
         if (abstractSyntaxTree->rightSibling == nullptr)
         {
-            // cout << "HERE 7" << endl;
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
         else
         {
-            // cout << "HERE 8" << endl;
             abstractSyntaxTree = abstractSyntaxTree->rightSibling;
         }
     }
