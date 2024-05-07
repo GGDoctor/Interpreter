@@ -354,6 +354,35 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
         {
             abstractSyntaxTree = abstractSyntaxTree->leftChild;
         }
+
+        /* 
+        *  Started working on the printf
+        *  Once it finds printf it takes the next sibling and saves the print statement
+        *  Need to go though the print statemnt and remove the %d  
+        *  Replace with the values that are given
+        *
+        */
+        else if(abstractSyntaxTree->token.character == "printf")
+        {
+            // cout <<"I am in the print statements" << endl;
+            
+            string print_string;
+            for(char c : abstractSyntaxTree->rightSibling->token.character)
+            {  
+                print_string += c; 
+            }
+            for (int i = 0; i < print_string.size(); i ++)
+            {
+                if (print_string.at(i) == '%' && print_string.at(i+1) == 'd')
+                {
+                    //Do work
+                    cout << abstractSyntaxTree->rightSibling->token.character << endl;
+                }
+            }
+            cout << print_string << endl;
+            // cout << abstractSyntaxTree->rightSibling->token.character << endl;
+            return;
+        }
         else
         {
             abstractSyntaxTree = abstractSyntaxTree->rightSibling;
