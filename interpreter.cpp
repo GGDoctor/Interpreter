@@ -251,115 +251,56 @@ void Interpreter::executeStack(/*Stack testStack*/){
             mockStack.Push(enteredStack.Top());
             cout << "Asterisk Found: " << enteredStack.Top().character << endl;
             
-            enteredStack.head = enteredStack.head->next;
+            string print_string;
+            for(char c : abstractSyntaxTree->rightSibling->token.character)
+            {  
+                print_string += c; 
+            }
+            for (int i = 0; i < print_string.size(); i ++)
+            {
+                if (print_string.at(i) == '%' && print_string.at(i+1) == 'd')
+                {
+                    //Do work
+
+                   // cout << abstractSyntaxTree->rightSibling->token.character << endl;
+                }
+            }
+            cout << print_string << endl;
+            // cout << abstractSyntaxTree->rightSibling->token.character << endl;
+            return;
         }
+        else
+        {
+            abstractSyntaxTree = abstractSyntaxTree->rightSibling;
+        }
+    }
+}
+
+void Interpreter::doMath(ProcessingStack workingStack, int scope)
+{
+    vector<int> maths;
+    int returnVar = 0;
+    int returnFuncVar = 0;
+    bool firstVar = true;
+    bool firstFuncVar = true;
+    while(workingStack.Top()){
+        for (int varz = 0; varz < variables.size(); varz ++)
+        {
+        //cout << "Token character: " <<workingStack.Top()->astNode->token.character << endl;
+        //cout << "Variable Name: "<< variables.at(varz).value_name << endl;
+            if((variables.at(varz).value_name == workingStack.Top()->astNode->token.character) && (variables.at(varz).scope == scope))
+            {
+                //pushes the value of the variable within scope to the maths vector
+                maths.push_back(variables.at(varz).value);
+                //marks the first variable being the variable that will be changed
+                if(firstVar){
+                    returnVar = varz;
+                    firstVar = false;
+                }
 
         
     }
     
 
 }
-
-// Token Interpreter::executeNumericalExpression(Stack numberStack){
-
-// }
-
-/*
-Interpreter::Interpreter(LCRS* ast, SymbolTable symbolTable)
-    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
-
-void Interpreter::execute() {
-
-}
-
-*/
-/*
-Interpreter::Interpreter(LCRS* ast, SymbolTable* symbolTable)
-    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
-
-void Interpreter::execute() {
-    if (abstractSyntaxTree) {
-        // Start execution from the main procedure
-        executeNode(abstractSyntaxTree);
-    }
-}
-
-void Interpreter::executeNode(LCRS* node) {
-    if (!node) return;
-
-    updateProgramCounter(node);  // Update the program counter before execution
-
-    switch (node->type) {
-        case NodeType::FunctionCall:
-            handleFunctionCall(node);
-            break;
-        case NodeType::Expression:
-            evalStack.push(evaluatePostfixExpression(node->tokens));
-            break;
-        case NodeType::Assignment:
-            if (node->children.size() > 1) {
-                int value = evalStack.top(); evalStack.pop();
-                symbolTable->updateSymbol(node->children[0]->token.value, value);
-            }
-            break;
-        // Add other cases as necessary for different types of statements
-    }
-
-    // Recursively execute child nodes if not a control flow statement
-    for (auto child : node->leftChild) {
-        executeNode(child);
-    }
-}
-
-int Interpreter::evaluatePostfixExpression(const std::vector<Token>& tokens) {
-    std::stack<int> stack;
-    for (const auto& token : tokens) {
-        if (token.isOperand()) {
-            stack.push(stoi(token.value));
-        } else {
-            int rhs = stack.top(); stack.pop();
-            int lhs = stack.top(); stack.pop();
-            switch (token.type) {
-                case TokenType::Plus: stack.push(lhs + rhs); break;
-                case TokenType::Minus: stack.push(lhs - rhs); break;
-                case TokenType::Multiply: stack.push(lhs * rhs); break;
-                case TokenType::Divide: stack.push(lhs / rhs); break;
-                // Handle other operators
-            }
-        }
-    }
-    return stack.top();
-}
-
-void Interpreter::handleFunctionCall(ASTNode* node) {
-    // Placeholder for function call handling logic
-}
-
-void Interpreter::updateProgramCounter(ASTNode* node) {
-    // Placeholder for program counter logic, e.g., handling loops, if-else conditions
-}
-
-int main() {
-    // Setup and execute the interpreter
-    AbstractSyntaxTree* ast; // Assume AST is created elsewhere
-    SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
-
-    Interpreter interpreter(ast, symbolTable);
-    interpreter.execute();
-
-    return 0;
-}
-*/
-
-// int main() {
-//     // Setup and execute the interpreter
-//     // AbstractSyntaxTree* ast; // Assume AST is created elsewhere
-//     // SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
-
-//     Interpreter interpreter(ast, symbolTable);
-//     interpreter.execute();
-
-//     return 0;
-// }
-
 
