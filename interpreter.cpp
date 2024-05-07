@@ -1,17 +1,25 @@
 #include "interpreter.hpp"
 using namespace std;
 
+
+//Constructor for our interpreter class
 Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, SymbolTable symbolTable)
 {
-    this->ast = ast.getAbstractSyntaxTree();
+    
+    //assigns the ast and cst to the corresponding members of interpreter class
+    this->ast = ast.getAbstractSyntaxTree(); 
     this->cst = cst.getConcreteSyntaxTree();
+
+    //Creating pointers and intilializing them with cst & ast
     LCRS *abstract = this->ast;
     LCRS *concrete = this->cst;
 
-    populateMappings(symbolTable.table, abstract, concrete);
 
+    //calling the functions
+    populateMappings(symbolTable.table, abstract, concrete);
     iterateMaps(astBySymbolTable, cstBySymbolTable, cstByAst);
 }
+
 
 /**
  * @param symbolTable - an stl linked list representing our symbol table
@@ -19,41 +27,52 @@ Interpreter::Interpreter(AbstractSyntaxTree ast, RecursiveDescentParser cst, Sym
  * @param _cst - the concrete syntax tree
  * @brief takes a symbol table entry as input and adds it to ast and cst maps
  */
+
+//This function is responsible for populating mappings betweeen symbol table
+//entries and nodes in AST and CST.
+//It iterates through AST and CST simultaneously
 void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, LCRS *cstNode)
 {
+    //declaring pointers so that we can manipulate then
     LCRS *_ast = astNode;
     LCRS *_cst = cstNode;
     LCRS *abstract = astNode;
     LCRS *concrete = cstNode;
+
     // used for multiple variables declared on same line seperated by commas
     int commaCounter = 0;
     bool dontWorryAboutCommas = false;
 
+    //Our main while loop to iterate through the AST and CST node
     while (abstract && concrete)
     {
-        
-            
+        //map AST to to CST node
         cstByAst[abstract] = concrete;
 
         LCRS *tempConcrete = concrete;
+
+        //loop through the Concrete Syntax tree nodes
         while (concrete->rightSibling)
         {
+            //checking for commas and updating the comma counter
             if (concrete->token.character == "," && tempConcrete->token.character != "printf")
                 commaCounter++;
             concrete = concrete->rightSibling;
         }
 
+        //Handling comma token
         if (commaCounter > 0)
         {
             for (int i = 0; i < commaCounter; i++)
             {
+                //move to the left child of abstract node
                 while (abstract->rightSibling)
                     abstract = abstract->rightSibling;
                 abstract = abstract->leftChild;
                 cstByAst[abstract] = tempConcrete;
             }
         }
-
+        //Handling "for" token
         if (tempConcrete->token.character == "for")
         {
             for (int i = 0; i < 2; i++)
@@ -72,19 +91,24 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
         if (concrete)
             concrete = concrete->leftChild;
 
+        //reset the comma counter
         commaCounter = 0;
     }
 
+    //looping through symbol table
     for (const auto &entry : symbolTable)
     {
         Variable newVar;
         FunctionVariable newFuncVar;
+        //handle function entries
         if (entry.identifierType == "function")
         {
+            //creating a new function variable and setting it's attributes
             newFuncVar.scope = entry.scope;
             newFuncVar.value_name = entry.identifierName;
             newFuncVar.value = 0;
             newFuncVar.head = _ast;
+            //Push the variable to the function variables vector
             functionVariables.push_back(newFuncVar);
             //grabs the parameter of the function and adds it to the variables vector
             newVar.scope = entry.scope;
@@ -106,6 +130,7 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
             astBySymbolTable[entry] = _ast;
             cstByAst[_ast] = _cst;
         }
+        //handle procedure
         else if (entry.identifierType == "procedure")
         {
 
@@ -121,9 +146,10 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
             cstBySymbolTable[entry] = _cst;
             astBySymbolTable[entry] = _ast;
         }
+        //handle a datatype
         else if (entry.identifierType == "datatype")
         {
-
+            
             if (entry.datatype == "int")
             {
                 newVar.scope = entry.scope;
@@ -213,8 +239,14 @@ void Interpreter::populateMappings(list<TableEntry> symbolTable, LCRS *astNode, 
     }
 }
 
+
+//This function prints the mappings between symbol table entries and their corresponding
+//AST and CST nodes. It iterates through the symbol table entries and AST nodes and prints
+//all the details such as identifies name, etc. For each entry it prints the AST node an 
+//CST node details
 void Interpreter::printAstCstBySymbolTable()
 {
+    //Iterate through the symbol table entries and the AST node
     for (auto [entry, astNode] : astBySymbolTable)
     {
         LCRS *cstNode = cstByAst[astNode];
@@ -232,6 +264,7 @@ void Interpreter::printAstCstBySymbolTable()
 
         cout << "\tast line " << astNode->token.lineNumber << ": ";
 
+        //traverse AST node and print characters
         while (astNode)
         {
             cout << astNode->token.character;
@@ -244,6 +277,7 @@ void Interpreter::printAstCstBySymbolTable()
 
         cout << "\n\tcst line " << cstNode->token.lineNumber << ": ";
 
+        //traverse CST node and printing their characters
         while (cstNode)
         {
             cout << cstNode->token.character;
@@ -258,14 +292,24 @@ void Interpreter::printAstCstBySymbolTable()
     }
 }
 
+
+
+// printCstByAst prints the mappings between AST nodes and their corresponding CST nodes.
+// It iterates through the mappings between AST and CST nodes, and prints the AST node details
+// followed by the corresponding CST node details.
 void Interpreter::printCstByAst()
 {
+    //iterate through the mappings between AST and CST nodes
     for (auto &[astNode, cstNode] : cstByAst)
     {
+        //initializing pointers to AST and CST nodes
         LCRS *_ast = astNode;
         LCRS *_cst = cstNode;
+
+        //print ast node details
         cout << "ast line " << _ast->token.lineNumber << ": ";
 
+        //traversing the AST nodes and printing characters
         while (_ast)
         {
             cout << _ast->token.character;
@@ -276,8 +320,10 @@ void Interpreter::printCstByAst()
             _ast = _ast->rightSibling;
         }
 
+        //print CST node details
         cout << "\ncst line " << _cst->token.lineNumber << ": ";
 
+        //Traverse the CST nodes and print characters
         while (_cst)
         {
             cout << _cst->token.character;
@@ -292,13 +338,17 @@ void Interpreter::printCstByAst()
     }
 }
 
+//iterateMaps iterates through the maps and prints out the variable list.
+//It also executes the "main" function if it's found in astSym
 void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS *, TableEntryHash> astSym, unordered_map<TableEntry, LCRS *, TableEntryHash> cstSym, unordered_map<LCRS *, LCRS *> cstAst)
 {
+    //printing out the variable list
     cout << "Variable List" << endl;
     for(auto vars: variables){
         cout << vars.value_name << endl;
     }
     
+    //iterate through astSyn map
     for (auto [entry, astNode] : astSym)
     {
         ProcessingStack workingStack;
@@ -311,7 +361,7 @@ void Interpreter::iterateMaps(unordered_map<TableEntry, LCRS *, TableEntryHash> 
 }
 
 
-
+//Execute the main function, traverses the AST to execute each line of code within main 
 void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
 {
     // iterate throught the syntax tree in order to start executing each line inside of main
@@ -390,14 +440,24 @@ void Interpreter::executeMain(LCRS *abstractSyntaxTree, int scope)
     }
 }
 
+
+//Performs mathematical operations based on the AST nodes
+//Updates variable values and handles function calls
 void Interpreter::doMath(ProcessingStack workingStack, int scope)
 {
+    //vector to store values of operands and results of operations
     vector<int> maths;
+    //index of the variable (this will be changed)
     int returnVar = 0;
+    //Index of the function variable
     int returnFuncVar = 0;
+
     bool firstVar = true;
     bool firstFuncVar = true;
+    
+    //Looping until the stack is empty
     while(workingStack.Top()){
+        //iterating through variables
         for (int varz = 0; varz < variables.size(); varz ++)
         {
         //cout << "Token character: " <<workingStack.Top()->astNode->token.character << endl;
@@ -453,12 +513,16 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             }
 
         }
+        //checks if the top token character is a digit
         if(isdigit(workingStack.Top()->astNode->token.character[0]))
         {
             cout << "FOUND DIGIT: " << stoi(workingStack.Top()->astNode->token.character) << endl;
+            //push the digit to the math vector
             maths.push_back(stoi(workingStack.Top()->astNode->token.character));
+            //pop the top from stack
             workingStack.Pop();
         }
+        //Handling the assignment operator
         else if (workingStack.Top()->astNode->token.character == "=")
         {
             //sets the first value in maths to the (hypothetically) only other value in maths
@@ -468,6 +532,7 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             variables.at(returnVar).value = maths.at(0);
             workingStack.Pop();
         }
+        //Handling the multiplication operator
         else if (workingStack.Top()->astNode->token.character == "*")
         {
             cout << "FOUND ASTERISK: " << workingStack.Top()->astNode->token.character << endl;
@@ -475,6 +540,7 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             maths.pop_back();
             workingStack.Pop();
         }
+        //Handling the division operator
         else if (workingStack.Top()->astNode->token.character == "/")
         {
             cout << "FOUND DIVIDE: " << workingStack.Top()->astNode->token.character << endl;
@@ -482,6 +548,7 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             maths.pop_back();
             workingStack.Pop();
         }
+        //Handling the addition operator
         else if (workingStack.Top()->astNode->token.character == "+")
         {
             cout << "FOUND PLUS: " << workingStack.Top()->astNode->token.character << endl;
@@ -489,6 +556,7 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             maths.pop_back();
             workingStack.Pop();
         }
+        //Handling the subtraction operator
         else if (workingStack.Top()->astNode->token.character == "-")
         {
             cout << "FOUND MINUS: " << workingStack.Top()->astNode->token.character << endl;
@@ -496,6 +564,8 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
             maths.pop_back();
             workingStack.Pop();
         }
+
+        //Handling the return statement
         else if(workingStack.Top()->astNode->token.character == "return"){
             //updates the function value with the value of the return variable;
             cout << "FOUND RETURN" << endl;
@@ -524,104 +594,4 @@ void Interpreter::doMath(ProcessingStack workingStack, int scope)
 
 }
 
-// Token Interpreter::executeNumericalExpression(Stack numberStack){
 
-// }
-
-/*
-Interpreter::Interpreter(LCRS* ast, SymbolTable symbolTable)
-    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
-
-void Interpreter::execute() {
-
-}
-
-*/
-/*
-Interpreter::Interpreter(LCRS* ast, SymbolTable* symbolTable)
-    : abstractSyntaxTree(ast), symbolTable(symbolTable), programCounter(0) {}
-
-void Interpreter::execute() {
-    if (abstractSyntaxTree) {
-        // Start execution from the main procedure
-        executeNode(abstractSyntaxTree);
-    }
-}
-
-void Interpreter::executeNode(LCRS* node) {
-    if (!node) return;
-
-    updateProgramCounter(node);  // Update the program counter before execution
-
-    switch (node->type) {
-        case NodeType::FunctionCall:
-            handleFunctionCall(node);
-            break;
-        case NodeType::Expression:
-            evalStack.push(evaluatePostfixExpression(node->tokens));
-            break;
-        case NodeType::Assignment:
-            if (node->children.size() > 1) {
-                int value = evalStack.top(); evalStack.pop();
-                symbolTable->updateSymbol(node->children[0]->token.value, value);
-            }
-            break;
-        // Add other cases as necessary for different types of statements
-    }
-
-    // Recursively execute child nodes if not a control flow statement
-    for (auto child : node->leftChild) {
-        executeNode(child);
-    }
-}
-
-int Interpreter::evaluatePostfixExpression(const std::vector<Token>& tokens) {
-    std::stack<int> stack;
-    for (const auto& token : tokens) {
-        if (token.isOperand()) {
-            stack.push(stoi(token.value));
-        } else {
-            int rhs = stack.top(); stack.pop();
-            int lhs = stack.top(); stack.pop();
-            switch (token.type) {
-                case TokenType::Plus: stack.push(lhs + rhs); break;
-                case TokenType::Minus: stack.push(lhs - rhs); break;
-                case TokenType::Multiply: stack.push(lhs * rhs); break;
-                case TokenType::Divide: stack.push(lhs / rhs); break;
-                // Handle other operators
-            }
-        }
-    }
-    return stack.top();
-}
-
-void Interpreter::handleFunctionCall(ASTNode* node) {
-    // Placeholder for function call handling logic
-}
-
-void Interpreter::updateProgramCounter(ASTNode* node) {
-    // Placeholder for program counter logic, e.g., handling loops, if-else conditions
-}
-
-int main() {
-    // Setup and execute the interpreter
-    AbstractSyntaxTree* ast; // Assume AST is created elsewhere
-    SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
-
-    Interpreter interpreter(ast, symbolTable);
-    interpreter.execute();
-
-    return 0;
-}
-*/
-
-// int main() {
-//     // Setup and execute the interpreter
-//     // AbstractSyntaxTree* ast; // Assume AST is created elsewhere
-//     // SymbolTable* symbolTable; // Assume SymbolTable is populated elsewhere
-
-//     Interpreter interpreter(ast, symbolTable);
-//     interpreter.execute();
-
-//     return 0;
-// }
