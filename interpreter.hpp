@@ -9,13 +9,18 @@
 //#include <stack>
 #include <vector>
 #include <unordered_map> 
-
+#include <sstream>
 struct Variable{ 
     string value_name;
     int value;
     int scope;
     };
-
+struct FunctionVariable{ 
+    string value_name;
+    int value;
+    int scope;
+    LCRS* head;
+    };
 
 
 class Interpreter {
@@ -26,7 +31,7 @@ public:
 
     void printAstCstBySymbolTable();
     void printCstByAst();
-    void executeMain(LCRS* abstractSyntaxTree, TableEntry entry);
+    void executeMain(LCRS* abstractSyntaxTree, int scope);
     void doMath(ProcessingStack workingStack, int scope);
     
     /*
@@ -38,6 +43,7 @@ private:
     LCRS* cst;
 
     vector<Variable> variables;
+    vector<FunctionVariable> functionVariables;
     /**
      * maps each entry in symbol table to its corresponding node in ast
      */ 
