@@ -9,7 +9,7 @@
 //#include <stack>
 #include <vector>
 #include <unordered_map> 
-
+#include <sstream>
 struct Variable{ 
     string value_name;
     int value;
